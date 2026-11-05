@@ -23,3 +23,6 @@ frontend/src/.observablehq/cache/
 _docs/
 _proc/
 .quarto/
+
+# paper sources stay local
+paper/
