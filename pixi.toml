@@ -1,0 +1,67 @@
+# Combined nada + nadayantra library, installable as a pixi package.
+#
+#   pixi run convert       download facebook/wav2vec2-base-960h into ~/.cache/nadakit/models
+#   pixi run transcribe    transcribe 16 kHz WAV files
+#   pixi run serve         start the FastHTML app at http://localhost:5001
+#   pixi run start         download the model if needed and start the FastHTML app
+#   pixi run install       download the checkpoint if missing and compile the CPU graphs
+#   pixi run warm          compile the 1s and 2s CPU graphs Engine pads clips to
+#   pixi run make-center   rebuild embed_center.npy (macOS, needs `say`)
+#
+# The sound model is wav2vec 2.0 on Modular MAX. Embeddings (mean-pool, center,
+# L2-normalize) live in nadakit.engine, the same path nadayantra and the
+# gananayantra helper used to keep in two copies.
+
+[workspace]
+name = "nadakit"
+channels = ["https://conda.modular.com/max/", "conda-forge"]
+platforms = ["osx-arm64", "linux-64"]
+version = "0.1.0"
+
+[tasks]
+convert = { cmd = "nadakit-convert", description = "Download facebook/wav2vec2-base-960h and write a safetensors checkpoint" }
+transcribe = { cmd = "nadakit-transcribe", description = "Transcribe 16 kHz WAV files: pixi run transcribe clip.wav" }
+serve = { cmd = "nadakit", description = "Run the web app on http://localhost:5001" }
+make-center = { cmd = "python -m nadakit.make_center", description = "Rebuild embed_center.npy from TTS and synthetic clips (macOS)" }
+
+[feature.app.tasks]
+warm = { cmd = "python -m nadakit.warm", description = "Compile the 1s and 2s CPU graphs Engine pads clips to" }
+install = { cmd = "python -c \"from nadakit.core import models_dir; raise SystemExit(0 if (models_dir() / 'wav2vec2.safetensors').is_file() else 1)\" || nadakit-convert; python -m nadakit.warm", description = "Download the checkpoint if needed and compile the CPU graphs" }
+start = { cmd = "nadakit", depends-on = ["install"], description = "Install the model if needed and run the web app on http://localhost:5001" }
+
+[dependencies]
+python = "3.14.*"
+max = ">=26.6.0,<27"
+numpy = ">=1.26"
+safetensors = ">=0.4"
+huggingface_hub = ">=0.26"
+nbdev = ">=3.3.26,<4"
+jupyter = ">=1.1.1,<2"
+
+[pypi-dependencies]
+nadakit = { path = ".", editable = true }
+python-fasthtml = "*"
+fastlite = ">=0.2.4, <0.3"
+
+[feature.app.pypi-dependencies]
+# Typing into other apps and watching the hold-to-talk key (macOS only)
+pyobjc-framework-Quartz = "*"
+pyobjc-framework-ApplicationServices = "*"
+
+# PyTorch wav2vec and the fastai head notebook. Separate from MAX: `pixi install -e train`.
+[feature.train.dependencies]
+python = "3.12.*"
+numpy = ">=1.26"
+nbdev = ">=3.3.26,<4"
+jupyter = ">=1.1.1,<2"
+
+[feature.train.pypi-dependencies]
+nadakit = { path = ".", editable = true }
+torch = ">=2.5"
+fastai = ">=2.7.18"
+transformers = ">=4.46"
+
+[environments]
+default = { solve-group = "default" }
+app = { features = ["app"], solve-group = "default" }
+train = { features = ["train"], no-default-feature = true }

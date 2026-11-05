@@ -1,0 +1,14 @@
+project:
+  output-dir: _docs
+
+website:
+  title: "nadakit"
+  site-url: "https://alix559.github.io/nadakit"
+  description: "Wav2vec 2.0 on Modular MAX, plus the embed engine and FastHTML app"
+  repo-branch: main
+  repo-url: "https://github.com/alix559/nadakit"
+
+format-links:
+  - html
+  - format: commonmark
+    text: Markdown

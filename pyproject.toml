@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nadakit"
+dynamic = ["version"]
+description = "Wav2vec 2.0 on Modular MAX, plus the embed engine and FastHTML app from nadayantra"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+authors = [{name = "Alex", email = "alixjcob559@gmail.com"}]
+keywords = ["wav2vec2", "speech", "asr", "max", "nbdev", "fasthtml"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+]
+dependencies = [
+    "numpy>=1.26",
+    "safetensors>=0.4",
+    "huggingface_hub>=0.26",
+    "python-fasthtml",
+    "fastlite>=0.2.4,<0.3",
+]
+
+[project.urls]
+Repository = "https://github.com/alix559/nadakit"
+Documentation = "https://alix559.github.io/nadakit"
+
+[project.scripts]
+nadakit = "nadakit.main:main"
+nadakit-convert = "nadakit.download:download_main"
+nadakit-transcribe = "nadakit.model:_main"
+
+[project.entry-points.nbdev]
+nadakit = "nadakit._modidx:d"
+
+[tool.setuptools.dynamic]
+version = {attr = "nadakit.__version__"}
+
+[tool.setuptools.packages.find]
+include = ["nadakit"]
+
+[tool.setuptools.package-data]
+nadakit = ["embed_center.npy", "glyph_table.json", "static/*"]
+
+[tool.nbdev]
+lib_path = "nadakit"
+nbs_path = "nbs"
+doc_path = "_docs"

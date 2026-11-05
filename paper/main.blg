@@ -1,0 +1,112 @@
+This is BibTeX, Version 0.99d (TeX Live 2025)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: main.aux
+The style file: ACM-Reference-Format.bst
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+Database file #1: references.bib
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated wiz_functions (elt_size=4) to 9000 items from 6000.
+Reallocated glb_str_ptr (elt_size=4) to 20 items from 10.
+Reallocated global_strs (elt_size=200001) to 20 items from 10.
+Reallocated glb_str_end (elt_size=4) to 20 items from 10.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Warning--empty publisher in Arnold2000VocalProgramming
+Warning--empty address in Arnold2000VocalProgramming
+Warning--empty publisher in Baevski2020Wav2vec
+Warning--empty address in Baevski2020Wav2vec
+Warning--empty publisher in Beaudouin2000CHI
+Warning--empty address in Beaudouin2000CHI
+Warning--no number and no volume in Buxton1986Chunking
+Warning--empty publisher in Corbett2016VUIs
+Warning--empty address in Corbett2016VUIs
+Warning--empty publisher in Desilets2006VoiceCode
+Warning--empty address in Desilets2006VoiceCode
+Warning--empty publisher in Baartse2018ClearSpeak
+Warning--empty address in Baartse2018ClearSpeak
+Warning--page numbers missing in both pages and numpages fields in Baartse2018ClearSpeak
+Warning--empty address in Gillon2009Tagging
+Warning--empty address in Goyal2013Reader
+Warning--page numbers missing in both pages and numpages fields in Goyal2013Reader
+Warning--no number and no volume in Green1989Design
+Warning--empty publisher in Harada2006Joystick
+Warning--empty address in Harada2006Joystick
+Warning--page numbers missing in both pages and numpages fields in Harada2006Joystick
+Warning--empty address in Huddleston2002Cambridge
+Warning--empty address in Huet2009Formal
+Warning--page numbers missing in both pages and numpages fields in Huet2009Formal
+Warning--empty address in Hutchins1995Cognition
+Warning--empty publisher in Irani2010CHI
+Warning--empty address in Irani2010CHI
+Warning--empty publisher in Jacob2008CHI
+Warning--empty address in Jacob2008CHI
+Warning--empty publisher in Kadvany2014Panini
+Warning--empty address in Kadvany2014Panini
+Warning--page numbers missing in both pages and numpages fields in Kadvany2014Panini
+Warning--empty publisher in Krishna2016Compound
+Warning--empty address in Krishna2016Compound
+Warning--empty address in Kulkarni2011Parser
+Warning--page numbers missing in both pages and numpages fields in Kulkarni2011Parser
+Warning--empty address in Kumar2010Processor
+Warning--no journal in Nemeth1972Math
+Warning--no number and no volume in Nemeth1972Math
+Warning--page numbers missing in both pages and numpages fields in Nemeth1972Math
+Warning--empty address in Norman1991Artifacts
+Warning--empty publisher in Olsen2007UIST
+Warning--empty address in Olsen2007UIST
+Warning--empty address in Pearl2016VUI
+Warning--empty address in Raman1994AsTeR
+Warning--empty publisher in RosenblattVocalIDE
+Warning--empty address in RosenblattVocalIDE
+Warning--page numbers missing in both pages and numpages fields in RosenblattVocalIDE
+Warning--empty publisher in Satuluri2013Generation
+Warning--empty publisher in Soiffer2005ASSETS
+Warning--empty address in Soiffer2005ASSETS
+Warning--empty publisher in Sorge2014W4A
+Warning--empty address in Sorge2014W4A
+Warning--page numbers missing in both pages and numpages fields in Sorge2014W4A
+Warning--empty publisher in Yankelovich1995CHI
+Warning--empty address in Yankelovich1995CHI
+You've used 47 entries,
+            6335 wiz_defined-function locations,
+            1840 strings with 26904 characters,
+and the built_in function-call counts, 50011 in all, are:
+= -- 6086
+> -- 1258
+< -- 0
++ -- 403
+- -- 472
+* -- 3161
+:= -- 4681
+add.period$ -- 242
+call.type$ -- 47
+change.case$ -- 288
+chr.to.int$ -- 46
+cite$ -- 103
+duplicate$ -- 4914
+empty$ -- 3478
+format.name$ -- 568
+if$ -- 12238
+int.to.chr$ -- 3
+int.to.str$ -- 1
+missing$ -- 186
+newline$ -- 410
+num.names$ -- 331
+pop$ -- 1986
+preamble$ -- 1
+purify$ -- 662
+quote$ -- 0
+skip$ -- 1731
+stack$ -- 0
+substring$ -- 3858
+swap$ -- 449
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 1061
+warning$ -- 56
+while$ -- 357
+width$ -- 0
+write$ -- 934
+(There were 56 warnings)

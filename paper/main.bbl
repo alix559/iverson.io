@@ -1,0 +1,565 @@
+%%% -*-BibTeX-*-
+%%% Do NOT edit. File created by BibTeX with style
+%%% ACM-Reference-Format-Journals [18-Jan-2012].
+
+\begin{thebibliography}{47}
+
+%%% ====================================================================
+%%% NOTE TO THE USER: you can override these defaults by providing
+%%% customized versions of any of these macros before the \bibliography
+%%% command.  Each of them MUST provide its own final punctuation,
+%%% except for \shownote{} and \showURL{}.  The latter does
+%%% not use final punctuation, in order to avoid confusing it with
+%%% the Web address.
+%%%
+%%% To suppress output of a particular field, define its macro to expand
+%%% to an empty string, or better, \unskip, like this:
+%%%
+%%% \newcommand{\showURL}[1]{\unskip}   % LaTeX syntax
+%%%
+%%% \def \showURL #1{\unskip}           % plain TeX syntax
+%%%
+%%% ====================================================================
+
+\ifx \showCODEN    \undefined \def \showCODEN     #1{\unskip}     \fi
+\ifx \showISBNx    \undefined \def \showISBNx     #1{\unskip}     \fi
+\ifx \showISBNxiii \undefined \def \showISBNxiii  #1{\unskip}     \fi
+\ifx \showISSN     \undefined \def \showISSN      #1{\unskip}     \fi
+\ifx \showLCCN     \undefined \def \showLCCN      #1{\unskip}     \fi
+\ifx \shownote     \undefined \def \shownote      #1{#1}          \fi
+\ifx \showarticletitle \undefined \def \showarticletitle #1{#1}   \fi
+\ifx \showURL      \undefined \def \showURL       {\relax}        \fi
+% The following commands are used for tagged output and should be
+% invisible to TeX
+\providecommand\bibfield[2]{#2}
+\providecommand\bibinfo[2]{#2}
+\providecommand\natexlab[1]{#1}
+\providecommand\showeprint[2][]{arXiv:#2}
+\makeatletter
+\@ifundefined{NAT@parse@date}{}{\let\NAT@parse@date@orig\NAT@parse@date}
+\@ifundefined{NAT@parse@date}{}{\def\NAT@parse@date#1#2#3#4#5#6@@{\NAT@parse@date@orig#1#2#3#4#5#6@@\def\NAT@tempyear{0000}\def\NAT@tempexlab{{?}}\ifx\NAT@year\NAT@tempyear\ifx\NAT@exlab\NAT@tempexlab\def\NAT@date{[n.\,d.]}\else\edef\NAT@date{[n.\,d.]\NAT@exlab}\fi\fi}}
+\makeatother
+
+\bibitem[Arnold et~al\mbox{.}(2000)]%
+        {Arnold2000VocalProgramming}
+\bibfield{author}{\bibinfo{person}{Stephen~C. Arnold}, \bibinfo{person}{Leo
+  Mark}, {and} \bibinfo{person}{John Goldthwaite}.}
+  \bibinfo{year}{2000}\natexlab{}.
+\newblock \showarticletitle{Programming by Voice, VocalProgramming}. In
+  \bibinfo{booktitle}{\emph{Proceedings of the Fourth International ACM
+  Conference on Assistive Technologies}}. \bibinfo{pages}{149--155}.
+\newblock
+\href{https://doi.org/10.1145/354324.354362}{doi:\nolinkurl{10.1145/354324.354362}}
+
+
+\bibitem[Baevski et~al\mbox{.}(2020)]%
+        {Baevski2020Wav2vec}
+\bibfield{author}{\bibinfo{person}{Alexei Baevski}, \bibinfo{person}{Yuhao
+  Zhou}, \bibinfo{person}{Abdelrahman Mohamed}, {and} \bibinfo{person}{Michael
+  Auli}.} \bibinfo{year}{2020}\natexlab{}.
+\newblock \showarticletitle{wav2vec 2.0: A Framework for Self-Supervised
+  Learning of Speech Representations}. In \bibinfo{booktitle}{\emph{Advances in
+  Neural Information Processing Systems}}, Vol.~\bibinfo{volume}{33}.
+  \bibinfo{pages}{12449--12460}.
+\newblock
+
+
+\bibitem[Beaudouin-Lafon(2000)]%
+        {Beaudouin2000CHI}
+\bibfield{author}{\bibinfo{person}{Michel Beaudouin-Lafon}.}
+  \bibinfo{year}{2000}\natexlab{}.
+\newblock \showarticletitle{Instrumental Interaction: An Interaction Model for
+  Designing Post-{WIMP} User Interfaces}. In
+  \bibinfo{booktitle}{\emph{Proceedings of the SIGCHI Conference on Human
+  Factors in Computing Systems}}. \bibinfo{pages}{446--453}.
+\newblock
+
+
+\bibitem[Blattner et~al\mbox{.}(1989)]%
+        {Blattner1989Earcons}
+\bibfield{author}{\bibinfo{person}{Meera~M. Blattner},
+  \bibinfo{person}{Denise~A. Sumikawa}, {and} \bibinfo{person}{Robert~M.
+  Greenberg}.} \bibinfo{year}{1989}\natexlab{}.
+\newblock \showarticletitle{Earcons and Icons: Their Structure and Common
+  Design Principles}.
+\newblock \bibinfo{journal}{\emph{Human--Computer Interaction}}
+  \bibinfo{volume}{4}, \bibinfo{number}{1} (\bibinfo{year}{1989}),
+  \bibinfo{pages}{11--44}.
+\newblock
+
+
+\bibitem[Boole(1854)]%
+        {Boole1854Laws}
+\bibfield{author}{\bibinfo{person}{George Boole}.}
+  \bibinfo{year}{1854}\natexlab{}.
+\newblock \bibinfo{booktitle}{\emph{An Investigation of the Laws of Thought}}.
+\newblock \bibinfo{publisher}{Macmillan}, \bibinfo{address}{London}.
+\newblock
+
+
+\bibitem[Buxton(1986)]%
+        {Buxton1986Chunking}
+\bibfield{author}{\bibinfo{person}{William Buxton}.}
+  \bibinfo{year}{1986}\natexlab{}.
+\newblock \showarticletitle{Chunking and Phrasing and the Design of
+  Human--Computer Dialogues}.
+\newblock \bibinfo{journal}{\emph{Proceedings of the IFIP World Computer
+  Congress}} (\bibinfo{year}{1986}), \bibinfo{pages}{475--480}.
+\newblock
+
+
+\bibitem[Corbett and Weber(2016)]%
+        {Corbett2016VUIs}
+\bibfield{author}{\bibinfo{person}{Eric Corbett} {and} \bibinfo{person}{Astrid
+  Weber}.} \bibinfo{year}{2016}\natexlab{}.
+\newblock \showarticletitle{What Can {I} Say? {A}ddressing User Experience
+  Challenges of a Mobile Voice User Interface for Accessibility}. In
+  \bibinfo{booktitle}{\emph{Proceedings of the 18th International Conference on
+  Human--Computer Interaction with Mobile Devices and Services}}.
+  \bibinfo{pages}{72--82}.
+\newblock
+
+
+\bibitem[D{\'e}silets(2001)]%
+        {Desilets2001VoiceGrip}
+\bibfield{author}{\bibinfo{person}{Alain D{\'e}silets}.}
+  \bibinfo{year}{2001}\natexlab{}.
+\newblock \showarticletitle{{VoiceGrip}: A Tool for Programming-by-Voice}.
+\newblock \bibinfo{journal}{\emph{International Journal of Speech Technology}}
+  \bibinfo{volume}{4}, \bibinfo{number}{2} (\bibinfo{year}{2001}),
+  \bibinfo{pages}{103--116}.
+\newblock
+
+
+\bibitem[D{\'e}silets et~al\mbox{.}(2006)]%
+        {Desilets2006VoiceCode}
+\bibfield{author}{\bibinfo{person}{Alain D{\'e}silets},
+  \bibinfo{person}{David~C. Fox}, {and} \bibinfo{person}{Stuart Norton}.}
+  \bibinfo{year}{2006}\natexlab{}.
+\newblock \showarticletitle{{VoiceCode}: An Innovative Speech Interface for
+  Programming-by-Voice}. In \bibinfo{booktitle}{\emph{CHI '06 Extended
+  Abstracts on Human Factors in Computing Systems}}. \bibinfo{pages}{239--242}.
+\newblock
+\href{https://doi.org/10.1145/1125451.1125502}{doi:\nolinkurl{10.1145/1125451.1125502}}
+
+
+\bibitem[Feng and Sears(2004)]%
+        {Feng2004TOCHI}
+\bibfield{author}{\bibinfo{person}{Jinjuan Feng} {and} \bibinfo{person}{Andrew
+  Sears}.} \bibinfo{year}{2004}\natexlab{}.
+\newblock \showarticletitle{Using Confidence Scores to Improve Hands-Free
+  Speech-Based Navigation in Continuous Dictation Systems}.
+\newblock \bibinfo{journal}{\emph{ACM Transactions on Computer-Human
+  Interaction}} \bibinfo{volume}{11}, \bibinfo{number}{4}
+  (\bibinfo{year}{2004}), \bibinfo{pages}{329--356}.
+\newblock
+\href{https://doi.org/10.1145/1035575.1035576}{doi:\nolinkurl{10.1145/1035575.1035576}}
+
+
+\bibitem[Franinovi{\'c} and Serafin(2013)]%
+        {Franinovic2013Sonic}
+\bibfield{editor}{\bibinfo{person}{Karmen Franinovi{\'c}} {and}
+  \bibinfo{person}{Stefania Serafin}} (Eds.). \bibinfo{year}{2013}\natexlab{}.
+\newblock \bibinfo{booktitle}{\emph{Sonic Interaction Design}}.
+\newblock \bibinfo{publisher}{MIT Press}, \bibinfo{address}{Cambridge, MA}.
+\newblock
+
+
+\bibitem[Frankel et~al\mbox{.}(2016)]%
+        {Baartse2018ClearSpeak}
+\bibfield{author}{\bibinfo{person}{Lois Frankel}, \bibinfo{person}{Beth
+  Brownstein}, {and} \bibinfo{person}{Neil Soiffer}.}
+  \bibinfo{year}{2016}\natexlab{}.
+\newblock \showarticletitle{Expanding Audio Access to Mathematics Expressions
+  by Students with Visual Impairments via {MathML}}. In
+  \bibinfo{booktitle}{\emph{Proceedings of the 31st Annual International
+  Technology and Persons with Disabilities Conference}}.
+\newblock
+
+
+\bibitem[Gillon(2009)]%
+        {Gillon2009Tagging}
+\bibfield{author}{\bibinfo{person}{Brendan~S. Gillon}.}
+  \bibinfo{year}{2009}\natexlab{}.
+\newblock \showarticletitle{Tagging Classical {Sanskrit} Compounds}. In
+  \bibinfo{booktitle}{\emph{Sanskrit Computational Linguistics 3}}
+  \emph{(\bibinfo{series}{LNAI}, Vol.~\bibinfo{volume}{5406})}.
+  \bibinfo{publisher}{Springer}, \bibinfo{pages}{98--105}.
+\newblock
+
+
+\bibitem[Goyal and Huet(2013)]%
+        {Goyal2013Reader}
+\bibfield{author}{\bibinfo{person}{Pawan Goyal} {and}
+  \bibinfo{person}{G{\'e}rard Huet}.} \bibinfo{year}{2013}\natexlab{}.
+\newblock \showarticletitle{Completeness Analysis of a {Sanskrit} Reader}. In
+  \bibinfo{booktitle}{\emph{Proceedings of the 5th International Symposium on
+  Sanskrit Computational Linguistics}}. \bibinfo{publisher}{D. K. Printworld}.
+\newblock
+
+
+\bibitem[Green(1989)]%
+        {Green1989Design}
+\bibfield{author}{\bibinfo{person}{T.~R.~G. Green}.}
+  \bibinfo{year}{1989}\natexlab{}.
+\newblock \showarticletitle{Cognitive Dimensions of Notations}.
+\newblock \bibinfo{journal}{\emph{People and Computers V}}
+  (\bibinfo{year}{1989}), \bibinfo{pages}{443--460}.
+\newblock
+
+
+\bibitem[Green and Petre(1996)]%
+        {Green1996Cognitive}
+\bibfield{author}{\bibinfo{person}{T.~R.~G. Green} {and}
+  \bibinfo{person}{Marian Petre}.} \bibinfo{year}{1996}\natexlab{}.
+\newblock \showarticletitle{Usability Analysis of Visual Programming
+  Environments: A `Cognitive Dimensions' Framework}.
+\newblock \bibinfo{journal}{\emph{Journal of Visual Languages and Computing}}
+  \bibinfo{volume}{7}, \bibinfo{number}{2} (\bibinfo{year}{1996}),
+  \bibinfo{pages}{131--174}.
+\newblock
+
+
+\bibitem[Harada et~al\mbox{.}(2006)]%
+        {Harada2006Joystick}
+\bibfield{author}{\bibinfo{person}{Susumu Harada}, \bibinfo{person}{James~A.
+  Landay}, \bibinfo{person}{Jonathan Malkin}, \bibinfo{person}{Xiao Li}, {and}
+  \bibinfo{person}{Jeff~A. Bilmes}.} \bibinfo{year}{2006}\natexlab{}.
+\newblock \showarticletitle{The Vocal Joystick: Discrete Speed Control with a
+  Continuous Gesture}. In \bibinfo{booktitle}{\emph{Proceedings of the 8th
+  International ACM SIGACCESS Conference on Computers and Accessibility}}.
+\newblock
+
+
+\bibitem[Huddleston and Pullum(2002)]%
+        {Huddleston2002Cambridge}
+\bibfield{author}{\bibinfo{person}{Rodney Huddleston} {and}
+  \bibinfo{person}{Geoffrey~K. Pullum}.} \bibinfo{year}{2002}\natexlab{}.
+\newblock \bibinfo{booktitle}{\emph{The {Cambridge} Grammar of the {English}
+  Language}}.
+\newblock \bibinfo{publisher}{Cambridge University Press}.
+\newblock
+
+
+\bibitem[Huet(2009)]%
+        {Huet2009Formal}
+\bibfield{author}{\bibinfo{person}{G{\'e}rard Huet}.}
+  \bibinfo{year}{2009}\natexlab{}.
+\newblock \showarticletitle{Formal Structure of {Sanskrit} Text: Requirements
+  Analysis for a Mechanical {Sanskrit} Processor}. In
+  \bibinfo{booktitle}{\emph{Sanskrit Computational Linguistics 1 \& 2}}
+  \emph{(\bibinfo{series}{LNAI}, Vol.~\bibinfo{volume}{5402})}.
+  \bibinfo{publisher}{Springer}.
+\newblock
+
+
+\bibitem[Hutchins(1995a)]%
+        {Hutchins1995Cognition}
+\bibfield{author}{\bibinfo{person}{Edwin Hutchins}.}
+  \bibinfo{year}{1995}\natexlab{a}.
+\newblock \bibinfo{booktitle}{\emph{Cognition in the Wild}}.
+\newblock \bibinfo{publisher}{MIT Press}.
+\newblock
+
+
+\bibitem[Hutchins(1995b)]%
+        {Hutchins1995Distributed}
+\bibfield{author}{\bibinfo{person}{Edwin Hutchins}.}
+  \bibinfo{year}{1995}\natexlab{b}.
+\newblock \showarticletitle{How a Cockpit Remembers Its Speeds}.
+\newblock \bibinfo{journal}{\emph{Cognitive Science}} \bibinfo{volume}{19},
+  \bibinfo{number}{3} (\bibinfo{year}{1995}), \bibinfo{pages}{265--288}.
+\newblock
+
+
+\bibitem[Irani et~al\mbox{.}(2010)]%
+        {Irani2010CHI}
+\bibfield{author}{\bibinfo{person}{Lilly Irani}, \bibinfo{person}{Janet
+  Vertesi}, \bibinfo{person}{Paul Dourish}, \bibinfo{person}{Kavita Philip},
+  {and} \bibinfo{person}{Rebecca~E. Grinter}.} \bibinfo{year}{2010}\natexlab{}.
+\newblock \showarticletitle{Postcolonial Computing: A Lens on Design and
+  Development}. In \bibinfo{booktitle}{\emph{Proceedings of the SIGCHI
+  Conference on Human Factors in Computing Systems}}.
+  \bibinfo{pages}{1311--1320}.
+\newblock
+
+
+\bibitem[Iverson(1962)]%
+        {Iverson1962APL}
+\bibfield{author}{\bibinfo{person}{Kenneth~E. Iverson}.}
+  \bibinfo{year}{1962}\natexlab{}.
+\newblock \bibinfo{booktitle}{\emph{A Programming Language}}.
+\newblock \bibinfo{publisher}{Wiley}, \bibinfo{address}{New York}.
+\newblock
+
+
+\bibitem[Iverson(1979)]%
+        {Iverson1979Operators}
+\bibfield{author}{\bibinfo{person}{Kenneth~E. Iverson}.}
+  \bibinfo{year}{1979}\natexlab{}.
+\newblock \showarticletitle{Operators}.
+\newblock \bibinfo{journal}{\emph{ACM Transactions on Programming Languages and
+  Systems}} \bibinfo{volume}{1}, \bibinfo{number}{2} (\bibinfo{year}{1979}),
+  \bibinfo{pages}{161--176}.
+\newblock
+\href{https://doi.org/10.1145/357073.357074}{doi:\nolinkurl{10.1145/357073.357074}}
+
+
+\bibitem[Iverson(1980)]%
+        {Iverson1980Notation}
+\bibfield{author}{\bibinfo{person}{Kenneth~E. Iverson}.}
+  \bibinfo{year}{1980}\natexlab{}.
+\newblock \showarticletitle{Notation as a Tool of Thought}.
+\newblock \bibinfo{journal}{\emph{Commun. ACM}} \bibinfo{volume}{23},
+  \bibinfo{number}{8} (\bibinfo{year}{1980}), \bibinfo{pages}{444--465}.
+\newblock
+\href{https://doi.org/10.1145/358896.358899}{doi:\nolinkurl{10.1145/358896.358899}}
+
+
+\bibitem[Jacob et~al\mbox{.}(2008)]%
+        {Jacob2008CHI}
+\bibfield{author}{\bibinfo{person}{Robert J.~K. Jacob}, \bibinfo{person}{Audrey
+  Girouard}, \bibinfo{person}{Leanne~M. Hirshfield},
+  \bibinfo{person}{Michael~S. Horn}, \bibinfo{person}{Orit Shaer},
+  \bibinfo{person}{Erin~Treacy Solovey}, {and} \bibinfo{person}{Jamie
+  Zigelbaum}.} \bibinfo{year}{2008}\natexlab{}.
+\newblock \showarticletitle{Reality-Based Interaction: A Framework for
+  Post-{WIMP} Interfaces}. In \bibinfo{booktitle}{\emph{Proceedings of the
+  SIGCHI Conference on Human Factors in Computing Systems}}.
+  \bibinfo{pages}{201--210}.
+\newblock
+
+
+\bibitem[Joshi(1968)]%
+        {Joshi1968Samartha}
+\bibfield{author}{\bibinfo{person}{S.~D. Joshi}.}
+  \bibinfo{year}{1968}\natexlab{}.
+\newblock \bibinfo{booktitle}{\emph{Pata{\~n}jali's
+  Vy{\=a}kara{\d{n}}a-Mah{\=a}bh{\=a}{\d{s}}ya: Samarth{\=a}hnika ({P}
+  2.1.1)}}.
+\newblock \bibinfo{publisher}{Centre of Advanced Study in Sanskrit, University
+  of Poona}, \bibinfo{address}{Poona}.
+\newblock
+
+
+\bibitem[Kadvany(2014)]%
+        {Kadvany2014Panini}
+\bibfield{author}{\bibinfo{person}{John Kadvany}.}
+  \bibinfo{year}{2014}\natexlab{}.
+\newblock \showarticletitle{P{\=a}{\d{n}}ini's Grammar and Modern Computation}.
+  In \bibinfo{booktitle}{\emph{Proceedings of AISB 50}}.
+\newblock
+
+
+\bibitem[Krishna et~al\mbox{.}(2016)]%
+        {Krishna2016Compound}
+\bibfield{author}{\bibinfo{person}{Amrith Krishna}, \bibinfo{person}{Pavankumar
+  Satuluri}, \bibinfo{person}{Shubham Sharma}, \bibinfo{person}{Apurv Kumar},
+  {and} \bibinfo{person}{Pawan Goyal}.} \bibinfo{year}{2016}\natexlab{}.
+\newblock \showarticletitle{Compound Type Identification in {Sanskrit}: What
+  Roles do the Corpus and Grammar Play?}. In
+  \bibinfo{booktitle}{\emph{Proceedings of the 6th Workshop on South and
+  Southeast Asian Natural Language Processing}}. \bibinfo{pages}{1--10}.
+\newblock
+
+
+\bibitem[Kulkarni and Kumar(2011)]%
+        {Kulkarni2011Parser}
+\bibfield{author}{\bibinfo{person}{Amba Kulkarni} {and} \bibinfo{person}{Anil
+  Kumar}.} \bibinfo{year}{2011}\natexlab{}.
+\newblock \showarticletitle{Statistical Constituency Parser for {Sanskrit}
+  Compounds}. In \bibinfo{booktitle}{\emph{Proceedings of ICON 2011}}.
+  \bibinfo{publisher}{Macmillan}.
+\newblock
+
+
+\bibitem[Kumar et~al\mbox{.}(2010)]%
+        {Kumar2010Processor}
+\bibfield{author}{\bibinfo{person}{Anil Kumar}, \bibinfo{person}{Vipul Mittal},
+  {and} \bibinfo{person}{Amba Kulkarni}.} \bibinfo{year}{2010}\natexlab{}.
+\newblock \showarticletitle{{Sanskrit} Compound Processor}. In
+  \bibinfo{booktitle}{\emph{Proceedings of the 4th International Sanskrit
+  Computational Linguistics Symposium}} \emph{(\bibinfo{series}{LNAI},
+  Vol.~\bibinfo{volume}{6465})}. \bibinfo{publisher}{Springer},
+  \bibinfo{pages}{57--69}.
+\newblock
+
+
+\bibitem[Mahavir(1986)]%
+        {Mahavir1986Samasa}
+\bibfield{author}{\bibinfo{person}{Mahavir}.} \bibinfo{year}{1986}\natexlab{}.
+\newblock \showarticletitle{Treatment of Sam{\=a}sa in {P}{\=a}{\d{n}}ini}.
+\newblock \bibinfo{journal}{\emph{Annals of the Bhandarkar Oriental Research
+  Institute}} \bibinfo{volume}{67}, \bibinfo{number}{1/4}
+  (\bibinfo{year}{1986}), \bibinfo{pages}{147--158}.
+\newblock
+
+
+\bibitem[Murti(1974)]%
+        {Murti1974Compounds}
+\bibfield{author}{\bibinfo{person}{M.~Srimannarayana Murti}.}
+  \bibinfo{year}{1974}\natexlab{}.
+\newblock \bibinfo{booktitle}{\emph{{Sanskrit} Compounds: A Philosophical
+  Study}}.
+\newblock \bibinfo{publisher}{The Chowkhamba Sanskrit Series Office},
+  \bibinfo{address}{Varanasi}.
+\newblock
+
+
+\bibitem[Nemeth(1972)]%
+        {Nemeth1972Math}
+\bibfield{author}{\bibinfo{person}{Abraham Nemeth}.}
+  \bibinfo{year}{1972}\natexlab{}.
+\newblock \showarticletitle{The {Nemeth} {Braille} Code for Mathematics and
+  Science Notation}.
+\newblock  (\bibinfo{year}{1972}).
+\newblock
+\newblock
+\shownote{American Printing House for the Blind}.
+
+
+\bibitem[Norman(1991)]%
+        {Norman1991Artifacts}
+\bibfield{author}{\bibinfo{person}{Donald~A. Norman}.}
+  \bibinfo{year}{1991}\natexlab{}.
+\newblock \showarticletitle{Cognitive Artifacts}.
+\newblock In \bibinfo{booktitle}{\emph{Designing Interaction}},
+  \bibfield{editor}{\bibinfo{person}{John~M. Carroll}} (Ed.).
+  \bibinfo{publisher}{Cambridge University Press}, \bibinfo{pages}{17--38}.
+\newblock
+
+
+\bibitem[Olsen(2007)]%
+        {Olsen2007UIST}
+\bibfield{author}{\bibinfo{person}{Dan~R. Olsen, Jr.}}
+  \bibinfo{year}{2007}\natexlab{}.
+\newblock \showarticletitle{Evaluating User Interface Systems Research}. In
+  \bibinfo{booktitle}{\emph{Proceedings of UIST}}. \bibinfo{pages}{251--258}.
+\newblock
+\href{https://doi.org/10.1145/1294211.1294256}{doi:\nolinkurl{10.1145/1294211.1294256}}
+
+
+\bibitem[Pearl(2016)]%
+        {Pearl2016VUI}
+\bibfield{author}{\bibinfo{person}{Cathy Pearl}.}
+  \bibinfo{year}{2016}\natexlab{}.
+\newblock \bibinfo{booktitle}{\emph{Designing Voice User Interfaces}}.
+\newblock \bibinfo{publisher}{O'Reilly}.
+\newblock
+
+
+\bibitem[Raman(1994)]%
+        {Raman1994AsTeR}
+\bibfield{author}{\bibinfo{person}{T.~V. Raman}.}
+  \bibinfo{year}{1994}\natexlab{}.
+\newblock \bibinfo{booktitle}{\emph{Audio System for Technical Readings}}.
+\newblock \bibinfo{publisher}{Cornell University}.
+\newblock
+\newblock
+\shownote{PhD thesis}.
+
+
+\bibitem[Rosenblatt et~al\mbox{.}(2018)]%
+        {RosenblattVocalIDE}
+\bibfield{author}{\bibinfo{person}{Lucas Rosenblatt}, \bibinfo{person}{Patrick
+  Carrington}, \bibinfo{person}{Kotaro Hara}, {and} \bibinfo{person}{Jeffrey~P.
+  Bigham}.} \bibinfo{year}{2018}\natexlab{}.
+\newblock \showarticletitle{Vocal Programming for People with Upper-Body Motor
+  Impairments}. In \bibinfo{booktitle}{\emph{Proceedings of the 15th
+  International Web for All Conference}}.
+\newblock
+\href{https://doi.org/10.1145/3192714.3192821}{doi:\nolinkurl{10.1145/3192714.3192821}}
+
+
+\bibitem[Satuluri and Kulkarni(2013)]%
+        {Satuluri2013Generation}
+\bibfield{author}{\bibinfo{person}{Pavankumar Satuluri} {and}
+  \bibinfo{person}{Amba Kulkarni}.} \bibinfo{year}{2013}\natexlab{}.
+\newblock \showarticletitle{Generation of {Sanskrit} Compounds}. In
+  \bibinfo{booktitle}{\emph{Proceedings of the 10th International Conference on
+  Natural Language Processing (ICON)}}. \bibinfo{address}{Noida, India},
+  \bibinfo{pages}{77--86}.
+\newblock
+
+
+\bibitem[Soiffer(2005)]%
+        {Soiffer2005ASSETS}
+\bibfield{author}{\bibinfo{person}{Neil Soiffer}.}
+  \bibinfo{year}{2005}\natexlab{}.
+\newblock \showarticletitle{{MathPlayer}: Web-Based Math Accessibility}. In
+  \bibinfo{booktitle}{\emph{Proceedings of the 7th International ACM SIGACCESS
+  Conference on Computers and Accessibility}}. \bibinfo{pages}{204--205}.
+\newblock
+
+
+\bibitem[Sorge et~al\mbox{.}(2014)]%
+        {Sorge2014W4A}
+\bibfield{author}{\bibinfo{person}{Volker Sorge}, \bibinfo{person}{Chris Chen},
+  \bibinfo{person}{T.~V. Raman}, {and} \bibinfo{person}{David Tseng}.}
+  \bibinfo{year}{2014}\natexlab{}.
+\newblock \showarticletitle{Towards Making Mathematics a First Class Citizen in
+  General Screen Readers}. In \bibinfo{booktitle}{\emph{Proceedings of the 11th
+  Web for All Conference}}.
+\newblock
+\href{https://doi.org/10.1145/2596695.2596700}{doi:\nolinkurl{10.1145/2596695.2596700}}
+
+
+\bibitem[Wagner and Gray(2015)]%
+        {Wagner2015Vocal}
+\bibfield{author}{\bibinfo{person}{Amber Wagner} {and} \bibinfo{person}{Jeff
+  Gray}.} \bibinfo{year}{2015}\natexlab{}.
+\newblock \showarticletitle{An Empirical Evaluation of a Vocal User Interface
+  for Programming by Voice}.
+\newblock \bibinfo{journal}{\emph{International Journal of Information
+  Technologies and Systems Approach}} \bibinfo{volume}{8}, \bibinfo{number}{2}
+  (\bibinfo{year}{2015}), \bibinfo{pages}{47--63}.
+\newblock
+
+
+\bibitem[Whitehead(1911)]%
+        {Whitehead1911Math}
+\bibfield{author}{\bibinfo{person}{Alfred~North Whitehead}.}
+  \bibinfo{year}{1911}\natexlab{}.
+\newblock \bibinfo{booktitle}{\emph{An Introduction to Mathematics}}.
+\newblock \bibinfo{publisher}{Williams and Norgate}, \bibinfo{address}{London}.
+\newblock
+
+
+\bibitem[Wobbrock et~al\mbox{.}(2011)]%
+        {Wobbrock2011Ability}
+\bibfield{author}{\bibinfo{person}{Jacob~O. Wobbrock},
+  \bibinfo{person}{Shaun~K. Kane}, \bibinfo{person}{Krzysztof~Z. Gajos},
+  \bibinfo{person}{Susumu Harada}, {and} \bibinfo{person}{Jon Froehlich}.}
+  \bibinfo{year}{2011}\natexlab{}.
+\newblock \showarticletitle{Ability-Based Design: Concept, Principles and
+  Examples}.
+\newblock \bibinfo{journal}{\emph{ACM Transactions on Accessible Computing}}
+  \bibinfo{volume}{3}, \bibinfo{number}{3} (\bibinfo{year}{2011}),
+  \bibinfo{pages}{1--27}.
+\newblock
+\href{https://doi.org/10.1145/1952383.1952384}{doi:\nolinkurl{10.1145/1952383.1952384}}
+
+
+\bibitem[Yankelovich et~al\mbox{.}(1995)]%
+        {Yankelovich1995CHI}
+\bibfield{author}{\bibinfo{person}{Nicole Yankelovich},
+  \bibinfo{person}{Gina-Anne Levow}, {and} \bibinfo{person}{Matt Marx}.}
+  \bibinfo{year}{1995}\natexlab{}.
+\newblock \showarticletitle{Designing {SpeechActs}: Issues in Speech User
+  Interfaces}. In \bibinfo{booktitle}{\emph{Proceedings of the SIGCHI
+  Conference on Human Factors in Computing Systems}}.
+  \bibinfo{pages}{369--376}.
+\newblock
+
+
+\bibitem[Zhang and Norman(1994)]%
+        {Zhang1994Representations}
+\bibfield{author}{\bibinfo{person}{Jiajie Zhang} {and}
+  \bibinfo{person}{Donald~A. Norman}.} \bibinfo{year}{1994}\natexlab{}.
+\newblock \showarticletitle{Representations in Distributed Cognitive Tasks}.
+\newblock \bibinfo{journal}{\emph{Cognitive Science}} \bibinfo{volume}{18},
+  \bibinfo{number}{1} (\bibinfo{year}{1994}), \bibinfo{pages}{87--122}.
+\newblock
+
+
+\end{thebibliography}
