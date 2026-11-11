@@ -27,10 +27,22 @@ dependencies = [
 Repository = "https://github.com/alix559/nadakit"
 Documentation = "https://alix559.github.io/nadakit"
 
+[project.optional-dependencies]
+receive = ["bleak>=0.22"]
+app = [
+  "pyobjc-framework-Quartz; sys_platform == 'darwin'",
+  "pyobjc-framework-ApplicationServices; sys_platform == 'darwin'",
+  "pyobjc-framework-CoreBluetooth; sys_platform == 'darwin'",
+  "pyobjc-framework-Cocoa; sys_platform == 'darwin'",
+  "pyobjc-framework-libdispatch; sys_platform == 'darwin'",
+  "bleak>=0.22",
+]
+
 [project.scripts]
 nadakit = "nadakit.main:main"
 nadakit-convert = "nadakit.download:download_main"
 nadakit-transcribe = "nadakit.model:_main"
+nadakit-receive = "nadakit.receive:main"
 
 [project.entry-points.nbdev]
 nadakit = "nadakit._modidx:d"

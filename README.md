@@ -63,10 +63,26 @@ vec = engine.embed(wave)  # 768-d unit vector
 ## Run the app
 
 ```sh
-pixi run serve
+pixi run start
+# or: pixi run serve
 ```
 
-The FastHTML app listens on <http://127.0.0.1:5001>. On macOS, `pixi install -e app` adds the Quartz bindings used to type into other apps and watch the hold-to-talk key.
+Starts without loading wav2vec — number→glyph typing only needs the SQLite library. The optional sound model is still available via `pixi run install` if you want mic recognition later.
+
+The FastHTML app listens on <http://127.0.0.1:5001>. On macOS, `pixi install -e app` adds the Quartz and CoreBluetooth bindings used to type into other apps, watch the hold-to-talk key, and advertise keys over Bluetooth LE.
+
+To type glyphs into a PC from the Swift **Transcribe** app over Bluetooth:
+
+1. On **Sound Names**, enter a number for each glyph (no microphone / wav2vec needed).
+2. In Transcribe, turn on **Link**, then speak that number.
+3. On the PC:
+
+```sh
+pip install 'nadakit[receive]'   # or: pixi install -e app
+nadakit-receive                  # or: pixi run receive
+```
+
+`nadakit-receive` maps each spoken number to its glyph from `gnn.db` and types it. Wav2vec is not used on this path.
 
 The Observable frontend in `frontend/` is optional. `npm run build` there puts a static build at `/app/` when `frontend/dist` exists; `npm run dev` serves it on port 3000 against the API on 5001.
 

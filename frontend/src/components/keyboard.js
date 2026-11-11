@@ -26,12 +26,13 @@ function press(b, k) {
 
 export async function keyboard(invalidation) {
   const status = await get("/sys/status").catch(() => ({available: false}));
-  let kon = false, held = false, es = null, keyed = 0;
+  let kon = false, held = false, es = null, bleOn = false, keyed = 0;
 
   const switchOn = html`<input type="checkbox" class="switch" role="switch" aria-label="Sound keyboard">`;
   const pk = html`<select aria-label="Hold to talk">
     <option value="AltRight">Right Option ⌥</option><option value="MetaRight">Right Command ⌘</option><option value="ControlRight">Right Control ⌃</option></select>`;
   const sys = html`<input type="checkbox" class="switch" role="switch" aria-label="Use in other apps">`;
+  const bt = html`<input type="checkbox" class="switch" role="switch" aria-label="Type to PC over Bluetooth">`;
   const kst = html`<div class="msg"></div>`;
   const hold = html`<button class="secondary" disabled>Hold to Talk</button>`;
   const scratch = html`<textarea id="scratch" rows="3" placeholder="Click here, then try it: characters appear in this box"></textarea>`;
@@ -43,7 +44,7 @@ export async function keyboard(invalidation) {
     if (isBusy()) return;
     say(!kon ? "Off. Nothing is typed."
       : keyed == 0 ? "Teach a sound first (on the Sound Names page), or give one a key."
-      : `Ready. Hold ${pk.selectedOptions[0].text} and make a sound.${es ? " Works in any app." : ""}`);
+      : `Ready. Hold ${pk.selectedOptions[0].text} and make a sound.${bleOn ? " Sending over Bluetooth." : es ? " Works in any app." : ""}`);
   }
 
   function listen() {
@@ -55,7 +56,7 @@ export async function keyboard(invalidation) {
       begin: () => { kst.className = "msg"; kst.replaceChildren(html`<b class="err">●</b>`, " Listening… ", meter, " ", secs); },
       end: () => { kst.className = "msg busy"; kst.textContent = "Matching…"; },
       send: async (audio) => {
-        const r = await post("/api/typekey", {audio, sys: !!es});
+        const r = await post("/api/typekey", {audio, sys: !!es, ble: bleOn});
         say(r.msg, r.kind);
         if (r.id != null) dispatchEvent(new CustomEvent("sound-typed", {detail: {id: r.id}})); // the sound tree lights it up
         if (r.page) press(scratch, r.key); // the server types for itself when "Use in other apps" is on
@@ -74,6 +75,7 @@ export async function keyboard(invalidation) {
   async function sysStart() {
     const off = (m) => { say(m, "err"); sysStop(); };
     if (!kon) return off("Turn on the sound keyboard first.");
+    if (bleOn) await btStop();
     let s = await get("/sys/status");
     if (!s.type || !s.listen) {
       s = await post("/sys/prompt");
@@ -87,16 +89,34 @@ export async function keyboard(invalidation) {
     idle();
   }
 
+  async function btStop() {
+    bleOn = false; bt.checked = false;
+    try { await post("/sys/bt", {on: "0"}); } catch (_) {}
+  }
+  async function btStart() {
+    const off = (m) => { say(m, "err"); btStop(); };
+    if (!kon) return off("Turn on the sound keyboard first.");
+    if (es) sysStop();
+    const s = await post("/sys/bt", {on: "1"});
+    if (!s.ok && !s.bt?.advertising) return off(s.bt?.error || "Could not advertise over Bluetooth. Check Bluetooth is on, then try again.");
+    bleOn = true;
+    say(s.bt?.connected
+      ? "Bluetooth on. A PC is connected — speak and it types there."
+      : "Bluetooth on. On the PC run `nadakit-receive` (or `pixi run receive`), then speak.",
+      s.bt?.connected ? "ok" : "warn");
+  }
+
   switchOn.onchange = async () => {
     kon = switchOn.checked; hold.disabled = !kon; held = false;
     keepOpen(kon);
     if (kon) {
       try { await open(); }
       catch (err) { say(err.message, "err"); kon = switchOn.checked = hold.disabled = false; keepOpen(false); return; }
-    } else { current() && stop(); close(); sysStop(); }
+    } else { current() && stop(); close(); sysStop(); await btStop(); }
     idle();
   };
   sys.onchange = () => (sys.checked ? sysStart() : (sysStop(), idle()));
+  bt.onchange = () => (bt.checked ? btStart() : (btStop(), idle()));
   pk.onchange = () => { localStorage.pk = pk.value; idle(); };
 
   // A page only sees keys while it is in front; "Use in other apps" takes over from these.
@@ -108,7 +128,7 @@ export async function keyboard(invalidation) {
   ["pointerup", "pointerleave", "pointercancel"].forEach((t) => hold.addEventListener(t, released));
   invalidation?.then(() => {
     removeEventListener("keydown", down); removeEventListener("keyup", up); removeEventListener("blur", blur);
-    sysStop(); current() && stop(); keepOpen(false);
+    sysStop(); btStop(); current() && stop(); keepOpen(false);
   });
 
   const row = (title, sub, control) => html`<div class="ctl"><div class="lbl"><strong>${title}</strong><small>${sub}</small></div>${control}</div>`;
@@ -117,6 +137,7 @@ export async function keyboard(invalidation) {
       <label class="ctl"><div class="lbl"><strong>Sound keyboard</strong><small>Turn it on, then hold the key and make a sound.</small></div>${switchOn}</label>
       ${row("Hold to talk", "The key you hold while making a sound.", pk)}
       ${status.available ? html`<label class="ctl"><div class="lbl"><strong>Use in other apps</strong><small>Types into the app in front and watches the key everywhere. macOS asks you to allow it.</small></div>${sys}</label>` : ""}
+      ${status.bt?.available ? html`<label class="ctl"><div class="lbl"><strong>Type to PC over Bluetooth</strong><small>Advertises as “nadakit”. On the PC run <code>nadakit-receive</code>.</small></div>${bt}</label>` : ""}
     </div>
     ${kst}
     <div class="hold">${hold}<small>The same as holding the key, for trying it here.</small></div>

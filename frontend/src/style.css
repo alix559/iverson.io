@@ -110,6 +110,9 @@ progress.meter { width: 8rem }
 .bar input { width: 5.5rem; text-align: center }
 .bar select { width: auto; min-width: 9rem }
 .bar button.lg { padding: .8rem 1.5rem }
+.num-form label { display: flex; flex-direction: column; gap: .25rem; font-size: .75rem; color: var(--mute) }
+.num-form label select { min-width: 16rem; max-width: min(28rem, 100%) }
+.num-form label input { width: 7rem }
 .bar .live { display: none; align-items: center; gap: .7rem; flex-wrap: wrap }
 body.rec .bar .idle { display: none }
 body.rec .bar .live { display: flex }
@@ -232,4 +235,5 @@ h4.sec small { font-size: .9rem; font-weight: 400 }
 
 [hidden] { display: none !important }
 .bar .idle { display: contents }
+.bar.num-form { align-items: flex-end }
 .trained, #trained { color: var(--mute); }

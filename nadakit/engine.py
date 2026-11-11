@@ -137,9 +137,14 @@ class Nada:
         return self.eng.embed(x)
 
     async def embed(self, x):
+        "Embed only when the model is already loaded — never auto-starts wav2vec."
         if self.state == "idle":
-            self.warm_up()
-        return await asyncio.get_running_loop().run_in_executor(self.pool, self._embed, x)  # queues behind loading
+            raise RuntimeError("Sound model is off. Number→glyph typing does not need it. Run `pixi run install` and call warm_up to enable mic recognition.")
+        if self.state == "starting":
+            raise RuntimeError("Sound model is still loading.")
+        if self.state == "failed":
+            raise RuntimeError(f"Sound model failed to load. {self.error or ''}")
+        return await asyncio.get_running_loop().run_in_executor(self.pool, self._embed, x)
 
 
 # %% ../nbs/08_engine.ipynb #c10

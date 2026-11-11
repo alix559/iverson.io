@@ -6,27 +6,29 @@ Docs: https://alix559.github.io/nadakit/main.html.md"""
 
 # %% auto #0
 __all__ = ['root', 'data', 'app', 'rt', 'kinds', 'table', 'G', 'SECS', 'SP', 'bad', 'db', 'sounds', 'mincos', 'st', 'mac', 'HERO',
-           'R', 'typable', 'typed', 'lab', 'cps', 'Sound', 'blob', 'vecs', 'snd', 'skey', 'add_ex', 'newname', 'rank',
-           'trained', 'fit_sounds', 'hit', 'embed', 'hue', 'NStat', 'Splash', 'page', 'nstat', 'splash', 'retry', 'ix',
-           'KeyPick', 'setkey', 'Notice', 'HeadNote', 'Recog', 'done', 'Tile', 'Detail', 'Row', 'Lib', 'lib', 'detail',
-           'names', 'learned', 'teach', 'learn', 'more', 'recognize', 'train', 'rename', 'forget', 'forgetall', 'KMeta',
-           'Msg', 'KRow', 'Log', 'index', 'sysstatus', 'sysprompt', 'sysevents', 'typekey', 'clear', 'main']
+           'R', 'typable', 'typed', 'lab', 'cps', 'Sound', 'blob', 'vecs', 'snd', 'skey', 'add_ex', 'newname', 'taken_names',
+           'set_number', 'rank', 'trained', 'fit_sounds', 'hit', 'embed', 'hue', 'NStat', 'Splash', 'page', 'nstat', 'splash',
+           'retry', 'ix', 'KeyPick', 'setkey', 'Notice', 'HeadNote', 'Recog', 'done', 'Tile', 'NameForm', 'Detail', 'Row',
+           'Lib', 'lib', 'detail', 'names', 'assign', 'learned', 'teach', 'learn', 'more', 'recognize', 'train', 'rename',
+           'forget', 'forgetall', 'KMeta', 'Msg', 'KRow', 'Log', 'index', 'sysstatus', 'sysprompt', 'sysbt', 'sysevents',
+           'typekey', 'clear', 'main']
 
 # %% ../nbs/11_main.ipynb #9da62bec
 from fasthtml.common import *
 from fastlite import database
-import json, random, time, unicodedata, numpy as np
+import json, time, unicodedata, numpy as np
 from .core import asset_dir, data_dir
 from .engine import nada, pcm, trim, dim
 from .head import active_head, score_library, train_library
-from . import keys
+from . import keys, bt
+
 
 # %% ../nbs/11_main.ipynb #2f260410
 root = asset_dir()
 data = data_dir()
 
 app,rt = fast_app(hdrs=(Link(rel='stylesheet', href='/style.css'), Link(rel='icon', href='/icon.png'), Script(src='/app.js')),
-                  static_path=str(root/'static'), key_fname=str(data/'.sesskey'), on_startup=[nada.warm_up])
+                  static_path=str(root/'static'), key_fname=str(data/'.sesskey'))
 
 # %% ../nbs/11_main.ipynb #f6d86bf9
 kinds = dict(functions='Functions', monadic_operators='Monadic operators', dyadic_operators='Dyadic operators', syntax_and_literals='Syntax and literals')
@@ -60,13 +62,26 @@ def add_ex(s, e): sounds.update(id=s.id, samples=blob(np.vstack([vecs(s), e])))
 
 # %% ../nbs/11_main.ipynb #c5d85821
 def newname(taken):
-    "A made-up name like rum, row or reh"
-    on,vo,co = 'r b d f g h j k l m n p s t v z sh ch'.split(), 'a e i o u eh ow ee oo ah'.split(), list('mnktpsglbd')
-    for _ in range(500):
-        v = random.choice(vo)
-        n = random.choice(on) + v + random.choice(co if len(v)<2 else ['']+co)  # two-letter vowels already end a word nicely
-        if n not in taken: return n
-    return f'snd{len(taken)+1}'
+    "Next unused positive integer, as a string — spoken in the Swift app to type the glyph."
+    n = 1
+    while str(n) in taken: n += 1
+    return str(n)
+
+def taken_names(except_id=None):
+    "Names already used by other sounds."
+    return {s.name for s in sounds() if except_id is None or s.id != except_id}
+
+def set_number(sym, name):
+    "Assign a number name to a glyph. Creates the sound row if needed. Returns (msg, err)."
+    name = (name or '').strip()
+    if not name.isdigit(): return 'Enter a number (digits only).', True
+    other = first(s for s in sounds() if s.name == name and s.glyph != sym)
+    if other: return f'Number {name} is already used by {other.glyph or other.name}.', True
+    if s := snd(sym):
+        sounds.update(id=s.id, name=name)
+        return f'{sym} is number {name}. Speak {name} in Transcribe to type it.', False
+    sounds.insert(Sound(name=name, glyph=sym, samples=b''))
+    return f'{sym} assigned number {name}. Speak {name} in Transcribe to type it.', False
 
 # %% ../nbs/11_main.ipynb #9c241bee
 # Below this cosine the closest sound is probably not what you made: a speaker repeating a sound
@@ -116,14 +131,15 @@ if not sounds() and mac.exists():
 def hue(i, n): return f'--t:{i/max(n-1,1):.3f}'  # yellow at the first item, red at the last
 def NStat():
     s = nada.state
-    kw = dict(hx_get='/nstat', hx_trigger='every 2s', hx_swap='outerHTML') if s in ('idle','starting') else {}
+    kw = dict(hx_get='/nstat', hx_trigger='every 2s', hx_swap='outerHTML') if s == 'starting' else {}
     msg = dict(idle='', starting='Loading nada…', ready=f'nada ready ({nada.device})', failed='nada unavailable')[s]
     return Small(msg, id='nstat', aria_busy='true' if s=='starting' else None, **kw)
 
 # %% ../nbs/11_main.ipynb #5f6da2fa
 def Splash():
+    "Only shown while the optional wav2vec model is loading; number→glyph typing needs no model."
     s = nada.state
-    if s == 'ready': return Div(id='splash')
+    if s in ('ready', 'idle'): return Div(id='splash')
     if s == 'failed': body = (H3('nada couldn’t start'), P(nada.error, cls='err'), Div(
         Button('Try Again', hx_post='/retry', hx_target='#splash', hx_swap='outerHTML'), Button('Continue Anyway', cls='secondary', onclick='skip()'), role='group'))
     else: body = (P('Preparing nada', aria_busy='true'), Small('Loading the sound model. The first launch can take a minute.'))
@@ -131,8 +147,8 @@ def Splash():
     return Div(Img(src='/icon.png', width=112), *body, id='splash', cls='splash', **kw)
 
 # %% ../nbs/11_main.ipynb #64ca9802
-HERO = dict(keys=('Speak in notations.', 'Hold a key, make a sound, and its glyph is typed.'),
-            names=('Teach it a sound.', 'Make a sound for each glyph, and it will remember.'))
+HERO = dict(keys=('Speak in notations.', 'Say a number in Transcribe, and its glyph is typed.'),
+            names=('Number each glyph.', 'Enter a number for a glyph; speak that number in the Swift app to type it.'))
 
 # %% ../nbs/11_main.ipynb #5e803b1c
 def page(cur, *c):
@@ -200,22 +216,35 @@ def Tile(g, i, n, sel, s):
                data_sym=g.sym, data_iast=g.iast, data_taught=int(bool(s)), title=f'{g.sym}  {g.mean}  {g.dev}  {g.iast}')
 
 # %% ../nbs/11_main.ipynb #20011b85
+def NameForm(sel='', oob=False):
+    "Top-of-page form: pick a glyph, type a number, assign — no microphone."
+    s = snd(sel) if sel else None
+    opts = [Option('Choose a glyph…', value='', selected=not sel)]
+    for title, gs in SECS:
+        opts.append(Optgroup(*[Option(f'{g.sym}  {g.iast} — {g.mean}', value=g.sym, selected=g.sym==sel) for g in gs], label=title))
+    return Form(
+        Label('Glyph', Select(*opts, name='sym', required=True)),
+        Label('Number', Input(name='name', value=s.name if s else '', placeholder='e.g. 1', inputmode='numeric',
+                              pattern='[0-9]+', required=True, autocomplete='off')),
+        Button('Assign', type='submit', cls='lg'),
+        hx_post='/assign', hx_target='#lib', hx_swap='outerHTML',
+        cls='bar num-form', id='nameform', **(dict(hx_swap_oob='true') if oob else {}))
+
 def Detail(sym=''):
     g,s = G.get(sym), snd(sym)
     if not g: return Div(id='det')
-    n = len(vecs(s)) if s else 0
-    acts = (Small(f'{n} example{"s"[:n!=1]}'), Small(f'types {lab(skey(s))}', Br(), Code(cps(skey(s)))), KeyPick(s, 'det'),
-            Button('Add Example', data_rec='/more', data_id=s.id, data_hint='Make the same sound again, then press Stop.'),
+    info = (Small(f'number {s.name} → types {lab(skey(s))}'), KeyPick(s, 'det'),
             Button('Forget', cls='outline', hx_post='/forget', hx_vals=dict(id=s.id, view='g', sel=sym), hx_target='#lib', hx_swap='outerHTML')
-           ) if s else (Button('Teach Sound', data_rec='/learn', data_sym=sym, data_hint=f'Make the sound for {sym} ({g.iast}), then press Stop.'),)
-    return Div(Div(g.sym, cls='big'), Div(Strong(f'{g.iast}  {g.dev}'), Br(), g.mean, Br(), Small(g.sec)), Div(*acts, cls='acts'), id='det')
+           ) if s else (Small('No number yet — use the form above.'),)
+    return Div(Div(g.sym, cls='big'), Div(Strong(f'{g.iast}  {g.dev}'), Br(), g.mean, Br(), Small(g.sec)), Div(*info, cls='acts'), id='det')
 
 # %% ../nbs/11_main.ipynb #c766b319
 def Row(s, i, n):
-    return Div(Span('✓' if s.id==hit() else '~'), Span(s.glyph), Input(value=s.name, name='v', hx_post='/rename', hx_vals=dict(id=s.id), hx_trigger='change', hx_swap='none'),
-               Small(f'{len(vecs(s))} ex.'), KeyPick(s, 'row'),
-               Button('+', title='Record another example', data_rec='/more', data_id=s.id, data_hint='Make the same sound again, then press Stop.'),
-               Button('×', cls='outline', title='Forget this sound', hx_post='/forget', hx_vals=dict(id=s.id, view='l'), hx_target='#lib', hx_swap='outerHTML'),
+    return Div(Span('✓' if s.id==hit() else '~'), Span(s.glyph),
+               Input(value=s.name, name='v', placeholder='Number', inputmode='numeric',
+                     hx_post='/rename', hx_vals=dict(id=s.id), hx_trigger='change', hx_swap='none'),
+               Small(f'types {lab(skey(s))}'), KeyPick(s, 'row'),
+               Button('×', cls='outline', title='Forget this mapping', hx_post='/forget', hx_vals=dict(id=s.id, view='l'), hx_target='#lib', hx_swap='outerHTML'),
                id=f'r{s.id}', cls='row', style=hue(i,n))
 
 # %% ../nbs/11_main.ipynb #e87c2aca
@@ -223,12 +252,12 @@ def Lib(view='g', sel=''):
     tabs = Div(*[Button(t, cls='' if view==v else 'outline', hx_get='/lib', hx_vals=dict(view=v, sel=sel), hx_target='#lib', hx_swap='outerHTML') for v,t in (('g','Glyphs'), ('l','All sounds'))], role='group', cls='tabs')
     if view == 'g':
         by = {s.glyph:s for s in sounds() if s.glyph}
-        body = (*[Div(H4(t, Small(f'  {sum(g.sym in by for g in gs)} of {len(gs)} taught')),
+        body = (*[Div(H4(t, Small(f'  {sum(g.sym in by for g in gs)} of {len(gs)} numbered')),
                       Div(*[Tile(g, i, len(gs), sel, by.get(g.sym)) for i,g in enumerate(gs)], cls='tiles')) for t,gs in SECS], Detail(sel))
     else:
         ss = sounds()
-        body = (H4(f'Taught sounds ({len(ss)})', Button('Remove All', cls='outline', hx_post='/forgetall', hx_target='#lib', hx_swap='outerHTML', hx_confirm='Forget every sound?')),
-                *[Row(s, i, len(ss)) for i,s in enumerate(ss)]) if ss else (P('No sounds taught yet. Press Teach a New Sound and make a sound.'),)
+        body = (H4(f'Numbered glyphs ({len(ss)})', Button('Remove All', cls='outline', hx_post='/forgetall', hx_target='#lib', hx_swap='outerHTML', hx_confirm='Forget every mapping?')),
+                *[Row(s, i, len(ss)) for i,s in enumerate(ss)]) if ss else (P('No numbers yet. Pick a glyph and enter a number for it.'),)
     return Div(tabs, *body, id='lib', data_view=view, data_sel=sel)
 
 # %% ../nbs/11_main.ipynb #58ad775e
@@ -241,15 +270,16 @@ def detail(sym:str): return Detail(sym)
 @rt('/names')
 def names():
     return page('names',
-        Div(Div(Button('Teach a New Sound', cls='rb', data_rec='/teach', data_hint='Make the sound, then press Stop.'),
-                Small('types'), Input(id='tk', maxlength=8, placeholder='Key'),
-                Select(Option('Text', value=''), *[Option(l, value=n) for n,l in SP.items()], id='ts'),
-                Button('Train', cls='rb outline', hx_post='/train', hx_target='#notice', hx_swap='outerHTML',
-                       hx_disabled_elt='this', title='Fit a classifier to every example of every sound'),
-                HeadNote(),
-                Button('Recognize', cls='rb secondary', data_rec='/recognize', data_hint='Make a sound, then press Stop.'), id='idle'),
-            Div(Button('Stop', cls='contrast', onclick='stop()'), Progress(cls='meter', value=0, max=1), Small('0.0 / 4 s', cls='secs'), Small(id='hint'), id='live')),
-        Div(id='notice'), Div(id='recog'), Lib())
+        NameForm(),
+        P('Speak the number in the Swift Transcribe app (Link on). ', Code('nadakit-receive'), ' types the glyph.'),
+        Div(id='notice'), Lib())
+
+# %% ../nbs/11_main.ipynb #assign
+@rt
+def assign(sym:str, name:str='', view:str='g', sel:str=''):
+    "Bind a spoken number to a glyph — no wav2vec / microphone needed."
+    msg, err = set_number(sym, name)
+    return done(msg, err, view, sel or sym), NameForm(sel or sym, oob=True)
 
 # %% ../nbs/11_main.ipynb #f28debba
 async def learned(audio, view, sel, f):
@@ -261,8 +291,8 @@ async def learned(audio, view, sel, f):
 async def teach(audio:str, key:str='', special:str='', view:str='g', sel:str=''):
     k = special if special in SP else key.strip() if typable(key.strip()) and key.strip() not in SP else ''
     def f(e):
-        s = sounds.insert(Sound(name=newname({x.name for x in sounds()}), key=k, samples=blob(e)))
-        return f'Saved as “{s.name}”' + (f' (types {lab(k)})' if k else '') + '. Make the same sound again and press Recognize.'
+        s = sounds.insert(Sound(name=newname(taken_names()), key=k, samples=blob(e)))
+        return f'Saved as “{s.name}”' + (f' (types {lab(k)})' if k else '') + '.'
     return await learned(audio, view, sel, f)
 
 # %% ../nbs/11_main.ipynb #3bf45481
@@ -270,8 +300,8 @@ async def teach(audio:str, key:str='', special:str='', view:str='g', sel:str='')
 async def learn(audio:str, sym:str, view:str='g', sel:str=''):
     def f(e):
         if s := snd(sym): add_ex(s, e); return f'Added another example to {sym} “{s.name}”.'
-        s = sounds.insert(Sound(name=G[sym].iast, glyph=sym, samples=blob(e)))
-        return f'Saved {sym} as “{s.name}”. Make the same sound again and press Recognize.'
+        s = sounds.insert(Sound(name=newname(taken_names()), glyph=sym, samples=blob(e)))
+        return f'Saved {sym} as number “{s.name}”.'
     return await learned(audio, view, sel, f)
 
 # %% ../nbs/11_main.ipynb #2ad6d35c
@@ -298,7 +328,12 @@ def train():
 
 # %% ../nbs/11_main.ipynb #7e3481f7
 @rt
-def rename(id:int, v:str): sounds.update(id=id, name=v)
+def rename(id:int, v:str):
+    v = (v or '').strip()
+    if not v.isdigit(): return  # keep prior name; numbers only
+    other = first(s for s in sounds() if s.name == v and s.id != id)
+    if other: return
+    sounds.update(id=id, name=v)
 
 # %% ../nbs/11_main.ipynb #93fea3df
 @rt
@@ -313,7 +348,7 @@ def Msg(t, k=''): return Div(t, id='kst', cls=k)
 # %% ../nbs/11_main.ipynb #fd398276
 def KRow(s, i, n):
     k = skey(s)
-    return Div(Span(s.glyph), Strong(s.name), Small(cps(k)), Small(f'{len(vecs(s))} ex.'), KeyPick(s, 'kbd'), id=f'k{s.id}', cls='row', style=hue(i,n)+('' if k else ';opacity:.55'))
+    return Div(Span(s.glyph), Strong(s.name), Small(cps(k)), Small('number'), KeyPick(s, 'kbd'), id=f'k{s.id}', cls='row', style=hue(i,n)+('' if k else ';opacity:.55'))
 
 # %% ../nbs/11_main.ipynb #456fe0d8
 def Log(oob=False):
@@ -331,28 +366,38 @@ def index():
             Div(Div(Strong('Hold to talk'), Small('The key you hold while making a sound.')),
                 Select(Option('Right Option ⌥', value='AltRight'), Option('Right Command ⌘', value='MetaRight'), Option('Right Control ⌃', value='ControlRight'), id='pk'), cls='ctl'),
             Label(Div(Strong('Use in other apps'), Small('Types into the app in front and watches the key everywhere. macOS asks you to allow it.')),
-                  Input(type='checkbox', role='switch', id='sys'), cls='ctl') if keys.available else '', cls='panel'),
+                  Input(type='checkbox', role='switch', id='sys'), cls='ctl') if keys.available else '',
+            Label(Div(Strong('Type to PC over Bluetooth'), Small('Advertises as “nadakit”. On the PC run `nadakit-receive` (or `pixi run receive`).')),
+                  Input(type='checkbox', role='switch', id='bt'), cls='ctl') if bt.available else '', cls='panel'),
         Msg('Off. Nothing is typed.'), KMeta(),
         Div(Button('Hold to Talk', id='hold', cls='secondary', disabled=True), Small('The same as holding the key, for trying it here.'), cls='hold'),
         Textarea(id='scratch', rows=3, placeholder='Click here, then try it: characters appear in this box'),
         Div(Button('Clear', cls='outline', onclick="$('#scratch').value=''"), cls='under'),
-        Div(Div(H4('Sounds and what they type'), *[KRow(s, i, len(ss)) for i,s in enumerate(ss)]) if ss else P('No sounds yet. Teach a sound for each glyph on the Sound Names page. Each one types its own glyph.'),
+        Div(Div(H4('Numbers and what they type'), *[KRow(s, i, len(ss)) for i,s in enumerate(ss)]) if ss else P('No numbers yet. Assign a number to each glyph on the Sound Names page. Speak that number in Transcribe to type the glyph.'),
             Log(), cls='stack'))
+
 
 # %% ../nbs/11_main.ipynb #6a02f839
 @rt('/sys/status')
-def sysstatus(): return keys.status()
+def sysstatus():
+    s = keys.status(); s['bt'] = bt.status(); return s
 @rt('/sys/prompt')
-def sysprompt(): keys.prompt(); return keys.status()
+def sysprompt(): keys.prompt(); return sysstatus()
+@rt('/sys/bt')
+def sysbt(on:str='0'):
+    "Start or stop advertising keys over Bluetooth LE."
+    ok = bt.start() if on in ('1', 'true', 'True', 'on') else bt.stop()
+    s = sysstatus(); s['ok'] = ok; return s
 @rt('/sys/events')
 def sysevents():
     "Tells the page when the hold key goes down or up in any app. Needs Input Monitoring."
     if not keys.watch(): return Response('Input Monitoring is off', status_code=403)
     return StreamingResponse(keys.events(), media_type='text/event-stream', headers={'Cache-Control':'no-cache', 'X-Accel-Buffering':'no'})
 
+
 # %% ../nbs/11_main.ipynb #db546913
 @rt
-async def typekey(audio:str, sys:bool=False):
+async def typekey(audio:str, sys:bool=False, ble:bool=False):
     if not any(skey(s) for s in sounds()): return Msg('No sound has a key yet. Assign keys on the Sound Keyboard page, or teach a glyph.', 'warn'), Log(True)
     e,err = await embed(audio)
     if err: return Msg(err, 'err'), Log(True)
@@ -360,10 +405,14 @@ async def typekey(audio:str, sys:bool=False):
     if b.cos < mincos: return Msg(f'Not sure. Closest was “{b.name}” ({b.cos:.2f}), so nothing was typed.', 'warn'), Log(True)
     k = skey(sounds[b.id])
     st.hist.insert(0, AttrDict(k=k, name=b.name, cos=b.cos)); del st.hist[30:]
+    if ble:  # UTF-8 notify to a PC running nadakit-receive
+        if bt.send(k): return Msg(f'Sent {lab(k)} for “{b.name}” over Bluetooth.', 'ok'), Log(True)
+        return Msg('No PC is connected. On the PC run `nadakit-receive`, then try again.', 'err'), Log(True)
     if sys:  # into whichever app has focus; the page's own box is left alone, or it would type twice
         if keys.type_key(k): return Msg(f'Typed {lab(k)} for “{b.name}” into the active app.', 'ok'), Log(True)
         return Msg('Typing into other apps is off in macOS. Turn the switch off and on again to fix it.', 'err'), Log(True)
     return HtmxResponseHeaders(trigger=json.dumps(dict(typed=dict(k=k)))), Msg(f'Typed {lab(k)} for “{b.name}”.', 'ok'), Log(True)
+
 
 # %% ../nbs/11_main.ipynb #fea145e3
 @rt

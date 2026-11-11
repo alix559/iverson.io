@@ -19,8 +19,7 @@ const setMode = (v) => (mode.value = v);
 ```
 
 ```js
-// One page, two views. The tabs only hide one and show the other, so the microphone, the sound
-// keyboard and everything on screen stay as they are when you switch, and nothing reloads.
+// One page, two views. The tabs only hide one and show the other, so state stays put when you switch.
 const views = {keys: html`<div id="keys"></div>`, names: html`<div id="names"></div>`};
 const show = (k) => { for (const [n, v] of Object.entries(views)) v.hidden = n !== k; };
 display(shell("keys", invalidation, show));

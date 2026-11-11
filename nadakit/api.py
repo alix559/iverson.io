@@ -14,15 +14,16 @@ from fasthtml.common import *
 from starlette.middleware.cors import CORSMiddleware
 from starlette.routing import Mount, Route
 from starlette.staticfiles import StaticFiles
-from . import keys
+from . import keys, bt
 from .core import asset_dir, checkout_root
+
 
 # %% ../nbs/10_api.ipynb #406ca2e2
 def mount(app, rt, ns):
     "Add the routes. `ns` is main.py's globals(), so the API uses the very same database, sounds and model."
     sounds, st, SP, G, SECS, nada = (ns[k] for k in 'sounds st SP G SECS nada'.split())
-    Sound, blob, vecs, skey, rank, embed, snd, add_ex, newname, typable, typed, lab, cps, hit, fit_sounds, trained = (
-        ns[k] for k in 'Sound blob vecs skey rank embed snd add_ex newname typable typed lab cps hit fit_sounds trained'.split())
+    Sound, blob, vecs, skey, rank, embed, snd, add_ex, newname, taken_names, set_number, typable, typed, lab, cps, hit, fit_sounds, trained = (
+        ns[k] for k in 'Sound blob vecs skey rank embed snd add_ex newname taken_names set_number typable typed lab cps hit fit_sounds trained'.split())
 
     app.add_middleware(CORSMiddleware, allow_origin_regex=r'http://(localhost|127\.0\.0\.1):\d+', allow_methods=['*'], allow_headers=['*'])
     dist = (checkout_root() or asset_dir())/'frontend'/'dist'
@@ -59,27 +60,35 @@ def mount(app, rt, ns):
     def api_glyphs(): return JSONResponse([dict(title=t, glyphs=[dict(sym=g.sym, mean=g.mean, dev=g.dev, iast=g.iast) for g in gs]) for t,gs in SECS])
 
     @rt('/api/retry')
-    def api_retry(): nada.warm_up(); return dict(ok=True)
+    def api_retry():
+        "Optional: load wav2vec. Number→glyph typing does not call this."
+        nada.warm_up(); return dict(ok=True, msg='Loading sound model…')
 
     # --- teaching and recognising. Each answers {ok, msg}, and the page asks for /api/state again.
     async def learned(audio, f):
         e, err = await embed(audio)
         return dict(ok=False, msg=err) if err else dict(ok=True, msg=f(e))
 
+    @rt('/api/assign')
+    def api_assign(sym:str, name:str=''):
+        "Bind a spoken number to a glyph — no wav2vec / microphone needed."
+        msg, err = set_number(sym, name)
+        return dict(ok=not err, msg=msg)
+
     @rt('/api/teach')
     async def api_teach(audio:str, key:str='', special:str=''):
         k = special if special in SP else key.strip() if typable(key.strip()) and key.strip() not in SP else ''
         def f(e):
-            s = sounds.insert(Sound(name=newname({x.name for x in sounds()}), key=k, samples=blob(e)))
-            return f'Saved as “{s.name}”' + (f' (types {lab(k)})' if k else '') + '. Make the same sound again and press Recognize.'
+            s = sounds.insert(Sound(name=newname(taken_names()), key=k, samples=blob(e)))
+            return f'Saved as “{s.name}”' + (f' (types {lab(k)})' if k else '') + '.'
         return await learned(audio, f)
 
     @rt('/api/learn')
     async def api_learn(audio:str, sym:str):
         def f(e):
             if s := snd(sym): add_ex(s, e); return f'Added another example to {sym} “{s.name}”.'
-            s = sounds.insert(Sound(name=G[sym].iast, glyph=sym, samples=blob(e)))
-            return f'Saved {sym} as “{s.name}”. Make the same sound again and press Recognize.'
+            s = sounds.insert(Sound(name=newname(taken_names()), glyph=sym, samples=blob(e)))
+            return f'Saved {sym} as number “{s.name}”.'
         return await learned(audio, f)
 
     @rt('/api/more')
@@ -110,10 +119,10 @@ def mount(app, rt, ns):
         return dict(ok=not err, msg=msg, trained=bool(trained()))
 
     @rt('/api/typekey')
-    async def api_typekey(audio:str, sys:bool=False):
+    async def api_typekey(audio:str, sys:bool=False, ble:bool=False):
         "The sound keyboard. `kind` is how the page should show it; `page` is true when the page itself should type `key`."
         t = time.time()
-        print(f"[nada] typekey start (sys={sys}, state={nada.state})", flush=True)
+        print(f"[nada] typekey start (sys={sys}, ble={ble}, state={nada.state})", flush=True)
         if not any(skey(s) for s in sounds()):
             print("[nada] typekey aborted: no keyed sounds", flush=True)
             return dict(ok=False, kind='warn', msg='No sound has a key yet. Assign keys on the Sound Keyboard page, or teach a glyph.')
@@ -129,6 +138,12 @@ def mount(app, rt, ns):
             return dict(ok=False, kind='warn', msg=f'Not sure. Closest was “{b.name}” ({b.cos:.2f}), so nothing was typed.')
         k = skey(sounds[b.id])
         st.hist.insert(0, AttrDict(k=k, name=b.name, cos=b.cos)); del st.hist[30:]
+        if ble:
+            if bt.send(k):
+                print(f"[nada] typekey {lab(k)} for {b.name} over bluetooth in {time.time() - t:.2f}s", flush=True)
+                return dict(ok=True, kind='ok', page=False, key=k, id=b.id, msg=f'Sent {lab(k)} for “{b.name}” over Bluetooth.')
+            print(f"[nada] typekey failed: no bluetooth subscriber after {time.time() - t:.2f}s", flush=True)
+            return dict(ok=False, kind='err', msg='No PC is connected. On the PC run `nadakit-receive`, then try again.')
         if sys:  # into whichever app has focus
             if keys.type_key(k):
                 print(f"[nada] typekey {lab(k)} for {b.name} into app in {time.time() - t:.2f}s", flush=True)
@@ -149,7 +164,12 @@ def mount(app, rt, ns):
         return dict(ok=True)
 
     @rt('/api/rename')
-    def api_rename(id:int, v:str): sounds.update(id=id, name=v); return dict(ok=True)
+    def api_rename(id:int, v:str):
+        v = (v or '').strip()
+        if not v.isdigit(): return dict(ok=False, msg='Name must be a number.')
+        other = first(s for s in sounds() if s.name == v and s.id != id)
+        if other: return dict(ok=False, msg=f'Number {v} is already used by {other.glyph or other.name}.')
+        sounds.update(id=id, name=v); return dict(ok=True)
 
     @rt('/api/forget')
     def api_forget(id:int): sounds.delete(id); st.rec = []; return dict(ok=True)
@@ -159,3 +179,4 @@ def mount(app, rt, ns):
 
     @rt('/api/clear')
     def api_clear(): st.hist.clear(); return dict(ok=True)
+

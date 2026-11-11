@@ -161,6 +161,10 @@ progress.meter { width: 8rem; margin: 0 }
 .kp { display: flex; gap: .4rem }
 .kp input { width: 4.2rem; text-align: center }
 .kp select { width: 8.5rem }
+.num-form label { display: flex; flex-direction: column; gap: .25rem; font-size: .75rem; color: var(--pico-muted-color, #666) }
+.num-form label select { min-width: 16rem; max-width: min(28rem, 100%) }
+.num-form label input { width: 7rem }
+.bar.num-form { align-items: flex-end }
 .hd, #lib h4 { display: flex; justify-content: space-between; align-items: center }
 .hd button, #lib h4 button { margin: 0; width: auto; padding: .3rem .9rem; font-size: .85rem }
 #lib h4, .stack h4 { font-size: 1.4rem; font-weight: 600; letter-spacing: -.025em; margin: 2.4rem 0 1rem }

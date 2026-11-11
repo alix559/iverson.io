@@ -6,8 +6,8 @@ import {post} from "./api.js";
 import {subscribe, refresh} from "./store.js";
 
 const HERO = {
-  keys: ["Speak in notations.", "Hold a key, make a sound, and its glyph is typed."],
-  names: ["Teach it a sound.", "Make a sound for each glyph, and it will remember."]
+  keys: ["Speak in notations.", "Say a number in Transcribe, and its glyph is typed."],
+  names: ["Number each glyph.", "Enter a number for a glyph; speak that number in the Swift app to type it."]
 };
 const icon = await FileAttachment("../icon.png").url();
 const TABS = [["keys", "Sound Keyboard"], ["names", "Sound Names"]];
@@ -22,18 +22,18 @@ export function shell(cur, invalidation, onSelect) {
 
   function paint({nada}) {
     const s = nada.state;
-    // A status pill: a green dot once the model is ready, a pulsing amber one while it loads, a red one if it failed.
+    // Number→glyph needs no model. Only show status while optionally loading wav2vec.
     const label = {idle: "", starting: "Loading nada", ready: "Nada ready", failed: "Nada unavailable"}[s] ?? "";
     nstat.className = `stat ${s}`;
     nstat.hidden = !label;
     nstat.title = s === "ready" ? `The sound model is loaded and running on ${nada.device}.` : s === "failed" ? nada.error ?? "" : "Loading the sound model.";
     nstat.replaceChildren(html`<i class="dot"></i>`, label, ...(s === "ready" && nada.device ? [html`<em>${nada.device}</em>`] : []));
-    // Poll while the model loads, then stop.
-    if (s === "idle" || s === "starting") timer ??= setInterval(refresh, 1000);
+    // Poll only while the optional model is loading.
+    if (s === "starting") timer ??= setInterval(refresh, 1000);
     else if (timer) { clearInterval(timer); timer = null; }
     if (s === last) return;
     last = s;
-    splash.hidden = s === "ready" || !!sessionStorage.gnnSkip;
+    splash.hidden = s === "ready" || s === "idle" || !!sessionStorage.gnnSkip;
     splash.replaceChildren(...(s === "failed"
       ? [html`<img src=${icon} alt="">`, html`<h3>nada couldn’t start</h3>`, html`<small class="err">${nada.error}</small>`,
          html`<div class="row2"><button onclick=${retry}>Try Again</button><button class="secondary" onclick=${skip}>Continue Anyway</button></div>`]

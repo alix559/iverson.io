@@ -1,6 +1,6 @@
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)]
 const REC_SECONDS = 4, MAX_SECONDS = 10  // teach/recognize cap at REC_SECONDS; stop sooner if you like. keyboard caps at MAX_SECONDS
-let ctx, stream, node, chunks = [], frames = 0, level = 0, on = false, cur = null, busy = false, held = false, kon = false, es = null
+let ctx, stream, node, chunks = [], frames = 0, level = 0, on = false, cur = null, busy = false, held = false, kon = false, es = null, bleOn = false
 
 // --- microphone: raw samples from a worklet, resampled to 16 kHz when you stop
 async function mic() {
@@ -90,8 +90,6 @@ document.addEventListener('click', e => {
   $('#lib').dataset.sel = t.dataset.sym
   t.scrollIntoView({behavior: 'smooth', block: 'center'})
   htmx.ajax('GET', '/detail', {target: '#det', swap: 'outerHTML', values: {sym: t.dataset.sym}})
-  if (t.dataset.taught == '0')  // the first tap on a glyph with no sound starts recording it
-    rec(t, '/learn', `Make the sound for ${t.dataset.sym} (${t.dataset.iast}), then press Stop.`, {sym: t.dataset.sym})
 })
 
 const skip = () => { sessionStorage.skip = 1; $('#splash')?.remove() }
@@ -118,8 +116,8 @@ document.addEventListener('typed', e => press(e.detail.k))
 function idle() {
   const k = $('#kst'); if (!k || cur || busy) return
   k.className = ''
-  k.textContent = !kon ? 'Off. Nothing is typed.' : +$('#kmeta').dataset.n == 0 ? 'Teach a sound first (on the Sound Names page), or give one a key.'
-    : `Ready. Hold ${$('#pk').selectedOptions[0].text} and make a sound.`
+  k.textContent = !kon ? 'Off. Nothing is typed.' : +$('#kmeta').dataset.n == 0 ? 'Assign a number to a glyph first (on the Sound Names page).'
+    : `Ready. Hold ${$('#pk').selectedOptions[0].text} and make a sound.${bleOn ? ' Sending over Bluetooth.' : sysOn() ? ' Works in any app.' : ''} Or speak numbers in Transcribe.`
 }
 
 async function listen() {
@@ -127,7 +125,7 @@ async function listen() {
   await start({
     begin: () => { $('#kst').className = ''; $('#kst').innerHTML = '<b class=err>●</b> Listening… <progress class=meter value=0 max=1></progress> <small class=secs>0.0 / 10 s</small>' },
     end: () => { $('#kst').innerHTML = 'Matching…'; $('#kst').setAttribute('aria-busy', 'true') },
-    send: audio => post('/typekey', {audio, sys: sysOn()}, '#kst')})
+    send: audio => post('/typekey', {audio, sys: sysOn(), ble: bleOn}, '#kst')})
   if (!held && cur) stop()  // the key came back up while the microphone was starting
 }
 const press_ = () => { if (kon && !held) { held = true; listen() } }
@@ -141,23 +139,25 @@ addEventListener('DOMContentLoaded', () => {
   $('#kon').onchange = async e => {
     kon = e.target.checked; $('#hold').disabled = !kon; held = false
     if (kon) { try { await mic() } catch (err) { say(err.message); kon = $('#kon').checked = $('#hold').disabled = false; return } }
-    else { cur && stop(); close(); sysStop() }
+    else { cur && stop(); close(); sysStop(); btStop() }
     idle()
   }
   addEventListener('keydown', e => !sysOn() && e.code == $('#pk').value && !e.repeat && press_())
   addEventListener('keyup', e => !sysOn() && e.code == $('#pk').value && release())
   addEventListener('blur', () => !sysOn() && release())  // other apps in front are the point when the switch is on
   $('#sys') && ($('#sys').onchange = e => e.target.checked ? sysStart() : sysStop())
+  $('#bt') && ($('#bt').onchange = e => e.target.checked ? btStart() : btStop())
   $('#hold').onpointerdown = press_
   ;['pointerup', 'pointerleave', 'pointercancel'].forEach(t => $('#hold').addEventListener(t, release))
 })
 
 // --- Use in other apps: the server watches the key and types, because a page can do neither
-function sysStop() { es?.close(); es = null; if ($('#sys')) $('#sys').checked = false; held && release() }
+function sysStop() { es?.close(); es = null; if ($('#sys')) $('#sys').checked = false; held && release(); idle() }
 
 async function sysStart() {
   const off = m => { say(m); sysStop() }
   if (!kon) return off('Turn on the sound keyboard first.')
+  if (bleOn) await btStop()
   let s = await (await fetch('/sys/status')).json()
   if (!s.type || !s.listen) {
     s = await (await fetch('/sys/prompt', {method: 'POST'})).json()
@@ -167,5 +167,25 @@ async function sysStart() {
   if (!r.ok) return off('macOS has not applied Input Monitoring yet. Quit the server and the terminal app, start them again, then turn this on.')
   es = new EventSource('/sys/events')
   es.onmessage = m => { const {code, down} = JSON.parse(m.data); code == $('#pk').value && (down ? press_() : release()) }
-  idle(); $('#kst').textContent += ' Works in any app.'
+  idle()
+}
+
+// --- Type to PC over Bluetooth: Mac advertises; PC runs nadakit-receive
+async function btStop() {
+  bleOn = false; if ($('#bt')) $('#bt').checked = false
+  try { await fetch('/sys/bt', {method: 'POST', body: new URLSearchParams({on: '0'})}) } catch (_) {}
+  idle()
+}
+
+async function btStart() {
+  const off = m => { say(m); btStop() }
+  if (!kon) return off('Turn on the sound keyboard first.')
+  if (sysOn()) sysStop()
+  const s = await (await fetch('/sys/bt', {method: 'POST', body: new URLSearchParams({on: '1'})})).json()
+  if (!s.ok && !s.bt?.advertising) return off(s.bt?.error || 'Could not advertise over Bluetooth. Check Bluetooth is on, then try again.')
+  bleOn = true; idle()
+  say(s.bt?.connected
+    ? 'Bluetooth on. A PC is connected — speak and it types there.'
+    : 'Bluetooth on. On the PC run `nadakit-receive` (or `pixi run receive`), then speak.', '')
+  $('#kst').className = s.bt?.connected ? 'ok' : 'warn'
 }

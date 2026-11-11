@@ -12,5 +12,7 @@ website:
       - 07_download.ipynb
       - 08_engine.ipynb
       - 09_keys.ipynb
+      - 15_bt.ipynb
+      - 16_receive.ipynb
       - 10_api.ipynb
       - 11_main.ipynb
