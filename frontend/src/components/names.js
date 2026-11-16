@@ -1,13 +1,27 @@
 // Sound Names: type a number for each glyph (no microphone).
 import {html} from "npm:htl";
 import {post} from "./api.js";
-import {sections, G, refresh, say} from "./store.js";
+import {sections, G, refresh, say, state} from "./store.js";
 import {hue, keyPick} from "./ui.js";
 
 let sel = "";
 
+/** Bottom label: basedpl English glyph name. */
+export function namesOf(g) {
+  return g.ename || g.mean;
+}
+
+function nextFreeCode() {
+  const used = new Set((state.sounds || []).map((s) => s.name));
+  for (let i = 1; i < 1000; i++) {
+    const c = String(i).padStart(3, "0");
+    if (!used.has(c)) return c;
+  }
+  return "001";
+}
+
 export function banner(app) {
-  return html`<small class="trained">Type a number for a glyph. Speak that number in Transcribe to type it on the PC.</small>`;
+  return html`<small class="trained">Assign a 3-digit code to each glyph (e.g. 001), then speak those digits in iverson.io (Link on). Basedpl names (plus, rho, …) also work.</small>`;
 }
 
 export function controls(sp) {
@@ -18,11 +32,11 @@ export function controls(sp) {
         <option value="">Choose a glyph…</option>
         ${sections.flatMap(({title, glyphs}) =>
           html`<optgroup label=${title}>${glyphs.map((g) =>
-            html`<option value=${g.sym}>${g.sym}  ${g.iast} — ${g.mean}</option>`)}</optgroup>`)}
+            html`<option value=${g.sym}>${g.sym}  ${namesOf(g)} — ${g.mean}</option>`)}</optgroup>`)}
       </select>
     </label>
     <label>Number
-      <input name="name" id="num-name" type="text" inputmode="numeric" pattern="[0-9]+" placeholder="e.g. 1" required autocomplete="off">
+      <input name="name" id="num-name" type="text" inputmode="numeric" pattern="[0-9]{1,3}" maxlength="3" placeholder="e.g. 001" required autocomplete="off">
     </label>
     <button class="lg" type="submit">Assign</button>
   </form>`;
@@ -38,13 +52,11 @@ async function onSubmit(e) {
   say(r.msg, r.ok ? "ok" : "err");
   if (r.ok) {
     sel = sym;
-    e.target.querySelector("#num-name").value = name;
+    await refresh();
+    e.target.querySelector("#num-name").value = nextFreeCode();
+  } else {
+    await refresh();
   }
-  await refresh();
-}
-
-export function recog(app) {
-  return html`<div class="recog"></div>`;
 }
 
 function syncForm(sym, name = "") {
@@ -53,7 +65,7 @@ function syncForm(sym, name = "") {
   const symEl = form.querySelector("#num-sym");
   const nameEl = form.querySelector("#num-name");
   if (symEl) symEl.value = sym || "";
-  if (nameEl && document.activeElement !== nameEl) nameEl.value = name;
+  if (nameEl && document.activeElement !== nameEl) nameEl.value = name || nextFreeCode();
 }
 
 export function library(app, mode, setMode) {
@@ -66,7 +78,7 @@ export function library(app, mode, setMode) {
     syncForm(sel, s?.name ?? "");
     det.replaceChildren(
       html`<div class="glyph">${g.sym}</div>`,
-      html`<div><strong>${g.iast}  ${g.dev}</strong><br>${g.mean}<br><small>${g.sec}</small>
+      html`<div><strong>${namesOf(g)}</strong><br>${g.mean}<br><small>${g.sec}</small>
         ${s ? html`<br><small>number <b>${s.name}</b> → types ${s.label}</small>` : html`<br><small>No number yet — use the form above.</small>`}</div>`,
       html`<div class="acts">${s
         ? [keyPick(s, app.sp),
@@ -76,8 +88,9 @@ export function library(app, mode, setMode) {
 
   function tile(g, i, n, s) {
     const cls = s ? "taught" : "";
+    const bottom = namesOf(g);
     const el = html`<div class="tile ${cls} ${g.sym === sel ? "sel" : ""}" style=${hue(i, n)} role="button" tabindex="0"
-        data-sym=${g.sym} title=${`${g.sym}  ${g.mean}${s ? `  #${s.name}` : ""}`}><small>${s ? `#${s.name}` : g.mean}</small><b>${g.sym}</b><i>${g.iast}</i></div>`;
+        data-sym=${g.sym} title=${`${g.sym}  ${bottom} — ${g.mean}${s ? `  #${s.name}` : ""}`}><small>${s ? `#${s.name}` : g.mean}</small><b>${g.sym}</b><i>${bottom}</i></div>`;
     el.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); el.click(); } };
     el.onclick = () => {
       document.querySelectorAll(".tile.sel").forEach((x) => x.classList.remove("sel"));
@@ -106,15 +119,18 @@ export function library(app, mode, setMode) {
     const ss = app.sounds;
     body = ss.length
       ? [html`<h4 class="sec">Numbered glyphs (${ss.length})<button class="outline sm" type="button" onclick=${async () => { if (confirm("Forget every mapping?")) { await post("/api/forgetall"); await refresh(); } }}>Remove All</button></h4>`,
-         ...ss.map((s, i) => html`<div class="row" style=${hue(i, ss.length)}>
+         ...ss.map((s, i) => {
+           const g = G.get(s.glyph);
+           return html`<div class="row" style=${hue(i, ss.length)}>
             <span>~</span><span>${s.glyph}</span>
             <input value=${s.name} placeholder="Number" inputmode="numeric" aria-label="Number" onchange=${async (e) => {
               const r = await post("/api/rename", {id: s.id, v: e.target.value});
               if (!r.ok) say(r.msg || "Rename failed", "err");
               await refresh();
             }}>
-            <small>types ${s.label}</small>${keyPick(s, app.sp)}
-            <button class="outline" type="button" title="Forget this mapping" onclick=${async () => { await post("/api/forget", {id: s.id}); await refresh(); }}>×</button></div>`)]
+            <small>${g ? namesOf(g) : ""} · types ${s.label}</small>${keyPick(s, app.sp)}
+            <button class="outline" type="button" title="Forget this mapping" onclick=${async () => { await post("/api/forget", {id: s.id}); await refresh(); }}>×</button></div>`;
+         })]
       : [html`<p class="empty">No numbers yet. Choose a glyph in the form above and type a number.</p>`];
   }
   return html`<div>${tabs}${body}</div>`;

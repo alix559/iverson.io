@@ -2,15 +2,8 @@ website:
   sidebar:
     contents:
       - index.ipynb
+      - 00_init.ipynb
       - 00_core.ipynb
-      - 01_config.ipynb
-      - 02_weights.ipynb
-      - 03_layers.ipynb
-      - 04_audio.ipynb
-      - 05_features.ipynb
-      - 06_model.ipynb
-      - 07_download.ipynb
-      - 08_engine.ipynb
       - 09_keys.ipynb
       - 15_bt.ipynb
       - 16_receive.ipynb

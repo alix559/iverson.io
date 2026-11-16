@@ -170,7 +170,7 @@ async function sysStart() {
   idle()
 }
 
-// --- Type to PC over Bluetooth: Mac advertises; PC runs nadakit-receive
+// --- Type to PC over Bluetooth: Mac advertises; PC runs iverson-receive
 async function btStop() {
   bleOn = false; if ($('#bt')) $('#bt').checked = false
   try { await fetch('/sys/bt', {method: 'POST', body: new URLSearchParams({on: '0'})}) } catch (_) {}
@@ -186,6 +186,6 @@ async function btStart() {
   bleOn = true; idle()
   say(s.bt?.connected
     ? 'Bluetooth on. A PC is connected — speak and it types there.'
-    : 'Bluetooth on. On the PC run `nadakit-receive` (or `pixi run receive`), then speak.', '')
+    : 'Bluetooth on. On the PC run `iverson-receive` (or `pixi run receive`), then speak.', '')
   $('#kst').className = s.bt?.connected ? 'ok' : 'warn'
 }

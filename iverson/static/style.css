@@ -1,4 +1,4 @@
-/* shabdayantra: quiet surfaces, one typeface, colour only where a sound has been learned.
+/* iverson.io: quiet surfaces, one typeface, colour only where a sound has been learned.
    Tokens first; everything below reads from them, so light and dark are one set of rules. */
 :root {
   --ink: #1d1d1f; --mute: #6e6e73; --paper: #fbfbfd; --raised: #fff;

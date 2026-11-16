@@ -1,4 +1,4 @@
-/* shabdayantra: quiet surfaces, one typeface, colour only where a sound has been learned.
+/* iverson.io: quiet surfaces, one typeface, colour only where a sound has been learned.
    Observable's layout and its light and dark themes come first; everything after is ours. */
 @import url("observablehq:default.css");
 @import url("observablehq:theme-air.css") (prefers-color-scheme: light);

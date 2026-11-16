@@ -1,98 +1,200 @@
-# nadakit
+# iverson.io
 
-Wav2vec 2.0 on [Modular MAX](https://docs.modular.com/max/), plus the embed engine and FastHTML app from [nadayantra](https://github.com/alix559/nadayantra). This is the package to install when you want the model and the sound-to-glyph runtime without checking out sibling repos.
+Desktop companion for the **[iverson.io](../iverson-ios)** iPhone/Mac app (`io.iverson.app`).
 
-The model is `facebook/wav2vec2-base-960h`: a convolutional feature encoder, a convolutional position embedding, and a 12-layer transformer, with a linear head that scores 32 characters for every 20 ms of audio. An embedding is the mean final hidden state over the clip, minus a fixed typical-audio vector (`embed_center.npy`), scaled to unit length.
+Speak **Sound Names** numbers (or glyph names like `plus`, `rho`) in the app. This project:
 
-## Install
+1. Lets you assign each glyph a **3-digit** number in a local web UI
+2. Connects over **Bluetooth** to the app when **Link** is on
+3. Types the matching glyph into the focused field on your Mac
 
-```sh
-pixi install
-pixi run convert
-```
+Python package: **`iverson`**. CLIs: **`iverson`** (web UI) and **`iverson-receive`** (Bluetooth).
 
-`convert` downloads the checkpoint and writes `~/.cache/nadakit/models/wav2vec2.safetensors` plus the character vocabulary. Set `NADA_MODELS` to use a different directory.
+---
 
-As a dependency of another pixi project (MAX still comes from Modular's conda channel):
+## What you need
 
-```toml
-[workspace]
-channels = ["https://conda.modular.com/max/", "conda-forge"]
-platforms = ["osx-arm64"]
+| Piece | Role |
+| --- | --- |
+| **iverson.io app** (`iverson-ios`) | On-device speech → sends 3-digit codes / glyph names over BLE |
+| **This repo** (`iverson-io`) | Web UI (number→glyph map) + `receive` (BLE central that types) |
+| **macOS** | Bluetooth on; Accessibility so receive can type into other apps |
 
-[dependencies]
-python = "3.14.*"
-max = ">=26.6.0,<27"
+Speech stays on the phone. BLE only carries short text (codes / names) to the linked computer.
 
-[pypi-dependencies]
-nadakit = { git = "https://github.com/alix559/nadakit.git" }
-```
+---
 
-Then `from nadakit import build, transcribe, Engine` and run `pixi run convert` once in this repo (or call `nadakit.download.download()`).
-
-## Transcribe
+## Quick start
 
 ```sh
-pixi run transcribe clip.wav
+cd iverson-io
+pixi install -e app
+pixi run serve
 ```
 
-The clip must be 16 kHz, 16-bit PCM WAV. The same thing from Python:
-
-```python
-from nadakit.features import read_wav
-from nadakit.model import build, compile_model, load_checkpoint, transcribe
-
-clip = read_wav("clip.wav")
-model = build()
-load_checkpoint(model)
-compiled = compile_model(model, batch=1, num_samples=clip.size)
-print(transcribe(model, compiled, [clip])[0])
-```
-
-## Embed
-
-```python
-from nadakit import Engine
-
-engine = Engine()
-vec = engine.embed(wave)  # 768-d unit vector
-```
-
-`Engine` compiles one graph per whole-second clip length and keeps the last four. `trim` cuts quiet lead-in and tail so a sound embeds the same however long you waited.
-
-## Run the app
+In another terminal, after the app shows a link code:
 
 ```sh
-pixi run start
-# or: pixi run serve
+pixi run receive --code 4821
 ```
 
-Starts without loading wav2vec — number→glyph typing only needs the SQLite library. The optional sound model is still available via `pixi run install` if you want mic recognition later.
+Then: hold the **Talk key**, speak a 3-digit code in iverson.io, release — the glyph is typed.
 
-The FastHTML app listens on <http://127.0.0.1:5001>. On macOS, `pixi install -e app` adds the Quartz and CoreBluetooth bindings used to type into other apps, watch the hold-to-talk key, and advertise keys over Bluetooth LE.
+---
 
-To type glyphs into a PC from the Swift **Transcribe** app over Bluetooth:
+## 1. Initialize the web UI (Sound Names)
 
-1. On **Sound Names**, enter a number for each glyph (no microphone / wav2vec needed).
-2. In Transcribe, turn on **Link**, then speak that number.
-3. On the PC:
+The UI stores your number→glyph library in SQLite (`data/gnn.db` when developing from this checkout).
 
 ```sh
-pip install 'nadakit[receive]'   # or: pixi install -e app
-nadakit-receive                  # or: pixi run receive
+pixi install -e app
+pixi run serve
 ```
 
-`nadakit-receive` maps each spoken number to its glyph from `gnn.db` and types it. Wav2vec is not used on this path.
+Open **http://127.0.0.1:5001**
 
-The Observable frontend in `frontend/` is optional. `npm run build` there puts a static build at `/app/` when `frontend/dist` exists; `npm run dev` serves it on port 3000 against the API on 5001.
+### Sound Names (`/names`)
+
+1. Pick a glyph from the dropdown (or the glyph grid).
+2. Enter a **1–3 digit** number (stored as a 3-digit code, e.g. `1` → `001`).
+3. Click **Assign**.
+
+Speak that number later in the app to type the glyph.
+
+### Sound Keyboard (`/`)
+
+- Lists every numbered glyph and what it types.
+- Set the **Talk key** (Control, Option, Command, Shift, Space, Caps Lock, or Fn).
+  Hold this key on the Mac while speaking; release to type into the focused app.
+- Optional: override the typed key for a glyph (default is the glyph itself).
+
+Leave `serve` running while you assign or change mappings. `receive` reads the same database.
+
+---
+
+## 2. Set up Bluetooth and permissions (Mac)
+
+### Bluetooth
+
+1. Turn **Bluetooth** on (System Settings → Bluetooth).
+2. Keep the iPhone/Mac running **iverson.io** nearby and in the **foreground**.
+3. In the app, tap **Link** — advertising starts as `iverson-XXXX` (your 4-digit code).
+
+The GATT service UUID (shared with the Swift peripheral) is:
+
+`6e616461-6b69-7400-4b42-000000000001`
+
+Characteristic (UTF-8 notify):
+
+`6e616461-6b69-7400-4b42-000000000002`
+
+### Accessibility (required to type)
+
+`receive` injects keystrokes via macOS Accessibility:
+
+1. Start `pixi run receive --code …` once, or open Sound Keyboard and use the system prompt routes.
+2. When macOS asks, allow **Terminal**, **iTerm**, or **Python** under  
+   **System Settings → Privacy & Security → Accessibility**.
+3. Focus a text field in the target app before speaking.
+
+Without Accessibility, linking still works but nothing will be typed.
+
+---
+
+## 3. Connect with the iOS (or Mac) application
+
+1. Build and run **iverson.io** from `../iverson-ios` (`Iverson.xcodeproj`) on iPhone or Mac.
+2. Assign numbers in the web UI (section 1) if you have not already.
+3. In the app, tap **Link** — note the **4-digit** code on screen (status: “Waiting for computer”).
+4. On this Mac:
+
+```sh
+pixi run receive --code XXXX
+```
+
+Replace `XXXX` with the code from the app (example: `4821`).
+
+5. When connected, the app shows **Linked**.
+6. On the Mac, focus a text field and choose your **Talk key** in Sound Keyboard if needed.
+7. **Hold the Talk key**, speak a **3-digit** code (e.g. “zero zero one”) or a glyph English name (`plus`, `rho`, …), then **release**.
+8. When three digits are ready (or a name resolves), the glyph is typed.
+
+Keep **Link** on and the app in the foreground while linked. If the scan fails, toggle Link for a fresh code and pass the new `--code`.
+
+### Receive CLI options
+
+```sh
+pixi run receive --code 4821
+pixi run receive --code 4821 --talk-key option
+pixi run receive --code 4821 --no-talk-key    # type every code immediately
+pixi run receive --code 4821 -v               # verbose BLE scan logs
+pixi run receive --code 4821 --timeout 30
+```
+
+Without pixi:
+
+```sh
+pip install 'iverson[app]'
+iverson-receive --code 4821
+```
+
+---
+
+## End-to-end checklist
+
+- [ ] `pixi install -e app`
+- [ ] `pixi run serve` → http://127.0.0.1:5001 → assign at least one Sound Name
+- [ ] Talk key set on Sound Keyboard
+- [ ] Mac Bluetooth on; Accessibility granted to the shell/Python running receive
+- [ ] iverson.io open, **Link** on, 4-digit code visible
+- [ ] `pixi run receive --code <that code>` → logs show connected / subscribed
+- [ ] Focus a text field → hold Talk key → speak `001` (or your code) → release → glyph appears
+
+---
+
+## Troubleshooting
+
+| Symptom | What to try |
+| --- | --- |
+| Scan finds nothing | App foreground + Link on; Bluetooth on; retry with `-v`; toggle Link for a new code |
+| Sees iverson service but wrong code | Use the **current** 4-digit code from the app |
+| Connected but nothing typed | Grant Accessibility; hold Talk key while speaking; focus a text field |
+| Wrong / no glyph | Confirm the 3-digit code exists under Sound Names; restart `receive` after changing the DB |
+| Talk key ignored | Match the key in Sound Keyboard, or pass `--talk-key`; use `--no-talk-key` to bypass |
+
+---
+
+## Project layout
+
+| Path | Purpose |
+| --- | --- |
+| `nbs/` | nbdev source (edit here, then export) |
+| `iverson/` | Exported Python package |
+| `data/gnn.db` | Local number→glyph library (dev checkout) |
+| `frontend/` | Optional Observable UI (served when `frontend/dist` exists) |
+| `../iverson-ios` | Swift app that advertises Link and sends spoken codes |
+
+### Useful modules
+
+- `iverson.main` — FastHTML app (`pixi run serve` / `iverson`)
+- `iverson.receive` — BLE central (`pixi run receive` / `iverson-receive`)
+- `iverson.bt` — shared service/characteristic UUIDs and peripheral name prefix
+- `iverson.keys` — macOS typing + talk-key gate
+
+---
 
 ## Develop
 
-This is an [nbdev](https://nbdev.fast.ai) project. Library code lives in notebooks under `nbs/` and is exported to the `nadakit` package:
+This is an [nbdev](https://nbdev.fast.ai) project. Edit notebooks under `nbs/`, then:
 
 ```sh
-pixi run nbdev-export
-pixi run nbdev-test
+pixi run nbdev_export
 ```
 
-`nada` and `nadayantra` stay as their own repos. They import this package for the shared model and embed path.
+Optional Observable frontend:
+
+```sh
+cd frontend && npm install && npm run build
+```
+
+When `frontend/dist` exists, the server serves it at `/`.

@@ -1,25 +1,21 @@
 ---
-title: shabdayantra
+title: iverson.io
 ---
 
 ```js
 import {shell} from "./components/shell.js";
 import {keyboard} from "./components/keyboard.js";
-import {soundTreemap} from "./components/treemap.js";
-import {log} from "./components/lists.js";
-import {controls, recog, library, banner} from "./components/names.js";
+import {controls, library, banner} from "./components/names.js";
 import {get} from "./components/api.js";
 import {notice} from "./components/ui.js";
 import {subscribe} from "./components/store.js";
 
-// What the server knows (sounds, history); this redraws whatever uses it when it changes.
 const app = Generators.observe((notify) => subscribe(notify));
-const mode = Mutable("g"); // Sound Names: glyph tiles, or a list of every taught sound
+const mode = Mutable("g");
 const setMode = (v) => (mode.value = v);
 ```
 
 ```js
-// One page, two views. The tabs only hide one and show the other, so state stays put when you switch.
 const views = {keys: html`<div id="keys"></div>`, names: html`<div id="names"></div>`};
 const show = (k) => { for (const [n, v] of Object.entries(views)) v.hidden = n !== k; };
 display(shell("keys", invalidation, show));
@@ -28,29 +24,20 @@ display(views.names);
 ```
 
 ```js
-// --- Sound Keyboard. The hierarchy is the glyph categories: keyboard > category > sound.
-const kb = await keyboard(invalidation);
-const tree = soundTreemap(invalidation);
-const typedBox = html`<div style="margin-top:2.4rem"></div>`;
-views.keys.replaceChildren(
-  kb.view,
-  html`<div><h4 class="sec">Sounds by category<small>Sized by examples taught. Drag to pan, pinch or ⌘-scroll to zoom.</small></h4>${tree.node}</div>`,
-  typedBox);
+const kbBox = html`<div></div>`;
+views.keys.replaceChildren(kbBox);
 ```
 
 ```js
-tree.update(app);
-kb.setKeyed(app.sounds.filter((s) => s.types).length);
-typedBox.replaceChildren(log(app));
+kbBox.replaceChildren(await keyboard(app, invalidation));
 ```
 
 ```js
-// --- Sound Names
 const notes = html`<div></div>`, lib = html`<div></div>`;
 views.names.replaceChildren(controls((await get("/api/state")).sp), notes, lib);
 ```
 
 ```js
-notes.replaceChildren(notice(app), banner(app), recog(app));
+notes.replaceChildren(notice(app), banner(app));
 lib.replaceChildren(library(app, mode, setMode));
 ```

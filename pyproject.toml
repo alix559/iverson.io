@@ -3,60 +3,51 @@ requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "nadakit"
+name = "iverson"
 dynamic = ["version"]
-description = "Wav2vec 2.0 on Modular MAX, plus the embed engine and FastHTML app from nadayantra"
+description = "iverson.io desktop companion: Sound Names web UI and Bluetooth receive"
 readme = "README.md"
 requires-python = ">=3.10"
 license = "Apache-2.0"
 authors = [{name = "Alex", email = "alixjcob559@gmail.com"}]
-keywords = ["wav2vec2", "speech", "asr", "max", "nbdev", "fasthtml"]
+keywords = ["bluetooth", "fasthtml", "speech", "glyphs"]
 classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
 ]
 dependencies = [
-    "numpy>=1.26",
-    "safetensors>=0.4",
-    "huggingface_hub>=0.26",
     "python-fasthtml",
     "fastlite>=0.2.4,<0.3",
+    "bleak>=0.22",
 ]
 
 [project.urls]
-Repository = "https://github.com/alix559/nadakit"
-Documentation = "https://alix559.github.io/nadakit"
+Repository = "https://github.com/alix559/iverson-io"
+Documentation = "https://alix559.github.io/iverson-io"
 
 [project.optional-dependencies]
-receive = ["bleak>=0.22"]
 app = [
   "pyobjc-framework-Quartz; sys_platform == 'darwin'",
   "pyobjc-framework-ApplicationServices; sys_platform == 'darwin'",
-  "pyobjc-framework-CoreBluetooth; sys_platform == 'darwin'",
-  "pyobjc-framework-Cocoa; sys_platform == 'darwin'",
-  "pyobjc-framework-libdispatch; sys_platform == 'darwin'",
-  "bleak>=0.22",
 ]
 
 [project.scripts]
-nadakit = "nadakit.main:main"
-nadakit-convert = "nadakit.download:download_main"
-nadakit-transcribe = "nadakit.model:_main"
-nadakit-receive = "nadakit.receive:main"
+iverson = "iverson.main:main"
+iverson-receive = "iverson.receive:main"
 
 [project.entry-points.nbdev]
-nadakit = "nadakit._modidx:d"
+iverson = "iverson._modidx:d"
 
 [tool.setuptools.dynamic]
-version = {attr = "nadakit.__version__"}
+version = {attr = "iverson.__version__"}
 
 [tool.setuptools.packages.find]
-include = ["nadakit"]
+include = ["iverson"]
 
 [tool.setuptools.package-data]
-nadakit = ["embed_center.npy", "glyph_table.json", "static/*"]
+iverson = ["glyph_table.json", "static/*"]
 
 [tool.nbdev]
-lib_path = "nadakit"
+lib_path = "iverson"
 nbs_path = "nbs"
 doc_path = "_docs"

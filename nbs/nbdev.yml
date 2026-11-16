@@ -2,11 +2,11 @@ project:
   output-dir: _docs
 
 website:
-  title: "nadakit"
-  site-url: "https://alix559.github.io/nadakit"
-  description: "Wav2vec 2.0 on Modular MAX, plus the embed engine and FastHTML app"
+  title: "iverson.io"
+  site-url: "https://alix559.github.io/iverson-io"
+  description: "Desktop companion for iverson.io — Sound Names UI and Bluetooth receive"
   repo-branch: main
-  repo-url: "https://github.com/alix559/nadakit"
+  repo-url: "https://github.com/alix559/iverson-io"
 
 format-links:
   - html
