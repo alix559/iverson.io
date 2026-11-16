@@ -83,10 +83,11 @@ def normalize_talk_key(name):
 class TalkGate:
     """Hold talk key → speak one code → release.
 
-    Types each accepted code immediately while armed. Short post-release grace
-    catches STT lag for the current press only. Dedupes bursty duplicate notifies.
+    Types each accepted code immediately while armed. Post-release grace catches
+    phone STT lag (often several seconds after you let go). Dedupes bursts; after
+    one typed code while released, the window closes so late dumps don't pile in.
     """
-    def __init__(self, key='ctrl', grace=3.0, dedupe=1.2):
+    def __init__(self, key='ctrl', grace=15.0, dedupe=1.2):
         self.key = normalize_talk_key(key)
         self.grace = grace
         self.dedupe = dedupe

@@ -23,8 +23,13 @@ python-fasthtml = "*"
 fastlite = ">=0.2.4, <0.3"
 bleak = ">=0.22"
 
+# macOS key injection + talk-key gate (required for `pixi run receive`)
+[target.osx-arm64.pypi-dependencies]
+pyobjc-framework-Quartz = "*"
+pyobjc-framework-ApplicationServices = "*"
+
 [feature.app.pypi-dependencies]
-# Type into other apps on macOS (used by iverson-receive)
+# Kept for `pixi run -e app …` compatibility
 pyobjc-framework-Quartz = "*"
 pyobjc-framework-ApplicationServices = "*"
 
